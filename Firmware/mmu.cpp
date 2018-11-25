@@ -22,38 +22,31 @@
 
 #define MMU_TODELAY 100
 #define MMU_TIMEOUT 10
-#define MMU_CMD_TIMEOUT 60000ul  //300000ul //1min timeout for mmu commands (except P0)
+#define MMU_CMD_TIMEOUT 300000ul  //300000ul //5min timeout for mmu commands (except P0)
 #define MMU_P0_TIMEOUT 3000ul //timeout for P0 command: 3seconds
+#define OCTO_NOTIFICATIONS_ON
 
 #ifdef MMU_HWRESET
 #define MMU_RST_PIN 76
 #endif //MMU_HWRESET
 
 bool mmu_enabled = false;
-
 bool mmu_ready = false;
 bool isMMUPrintPaused = false;
-
 bool mmuFSensorLoading = false;
 int lastLoadedFilament = -10;
-
 int8_t mmu_state = 0;
 int8_t last_state = -10;
-
 uint8_t mmu_cmd = 0;
+int toolChanges = 0;
 bool ack_received = false;
-
 uint8_t mmu_extruder = 0;
 
 //! This variable probably has no meaning and is planed to be removed
 uint8_t tmp_extruder = 0;
-
 int8_t mmu_finda = -1;
-
 int16_t mmu_version = -1;
-
 int16_t mmu_buildnr = -1;
-
 uint32_t mmu_last_request = 0;
 uint32_t mmu_last_response = 0;
 
@@ -211,8 +204,6 @@ void mmu_loop(void)
 #ifdef MMU_DEBUG
     if (last_state != mmu_state) printf_P(PSTR("MMU loop, state=%d\n"), mmu_state);
 #endif //MMU_DEBUG
-    //if (mmu_print_saved && !isMMUPrintPaused) { printf_P(PSTR("// action:pause\n")); isMMUPrintPaused = true; }
-    //if (!mmu_print_saved && isMMUPrintPaused) { printf_P(PSTR("// action:resume\n")); isMMUPrintPaused = false; }
     last_state = mmu_state;
     switch (mmu_state)
     {
@@ -368,7 +359,8 @@ void mmu_loop(void)
             {
                 filament = mmu_cmd - MMU_CMD_T0;
                 if (lastLoadedFilament != filament) {
-                    printf_P(PSTR("MMU <= 'T%d'\n"), filament);
+                    toolChanges++;
+                    printf_P(PSTR("MMU <= 'T%d @toolChange:%d'\n"), filament, toolChanges);
                     mmu_puts_P(PSTR("EE\n")); // Advise MMU CMD is correct, execute
                     mmu_state = 3; // wait for response
                 } else {
@@ -395,6 +387,7 @@ void mmu_loop(void)
             {
                 printf_P(PSTR("MMU <= 'U0'\n"));
                 mmu_puts_P(PSTR("EE\n")); // Advise MMU CMD is correct, execute
+                toolChanges = 0;
                 lastLoadedFilament = -10;
                 mmu_state = 3;
             }
@@ -502,15 +495,6 @@ int8_t mmu_set_filament_type(uint8_t extruder, uint8_t filament)
 
 void mmu_command(uint8_t cmd)
 {
-#ifdef TMC2130
-    if ((cmd >= MMU_CMD_T0) && (cmd <= MMU_CMD_T4))
-    {
-        //disable extruder motor
-        tmc2130_set_pwr(E_AXIS, 0);
-        //printf_P(PSTR("E-axis disabled\n"));
-    }
-#endif //TMC2130
-
     mmu_cmd = cmd;
     mmu_ready = false;
 }
@@ -556,6 +540,9 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
                 }
                 st_synchronize();
                 mmu_print_saved = true;
+#ifdef OCTO_NOTIFICATIONS_ON
+                printf_P(PSTR("// action:mmuAttention\n"));
+#endif // OCTO_NOTIFICATIONS_ON
                 printf_P(PSTR("MMU not responding\n"));
                 hotend_temp_bckp = degTargetHotend(active_extruder);
                 if (move_axes) {
@@ -689,6 +676,9 @@ void mmu_M600_wait_and_beep() {
     //Beep and wait for user to remove old filament and prepare new filament for load
 
     KEEPALIVE_STATE(PAUSED_FOR_USER);
+#ifdef OCTO_NOTIFICATIONS_ON
+    printf_P(PSTR("// action:m600\n"));
+#endif // OCTO_NOTIFICATIONS_ON
 
     int counterBeep = 0;
     lcd_display_message_fullscreen_P(_i("Remove old filament and press the knob to start loading new filament."));
