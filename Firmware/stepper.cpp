@@ -226,25 +226,25 @@ void MultiU24X24toH16(uint16_t& intRes, int32_t& longIn1, long& longIn2)
 
 void checkHitEndstops()
 {
-    if( endstop_x_hit || endstop_y_hit || endstop_z_hit) {
-        SERIAL_ECHO_START;
-        SERIAL_ECHORPGM(_T(MSG_ENDSTOPS_HIT));
-        if(endstop_x_hit) {
-            SERIAL_ECHOPAIR(" X:",(float)endstops_trigsteps[X_AXIS]/cs.axis_steps_per_unit[X_AXIS]);
-//     LCD_MESSAGERPGM(CAT2(_T(MSG_ENDSTOPS_HIT), PSTR("X")));
-        }
-        if(endstop_y_hit) {
-            SERIAL_ECHOPAIR(" Y:",(float)endstops_trigsteps[Y_AXIS]/cs.axis_steps_per_unit[Y_AXIS]);
-//     LCD_MESSAGERPGM(CAT2(_T(MSG_ENDSTOPS_HIT), PSTR("Y")));
-        }
-        if(endstop_z_hit) {
-            SERIAL_ECHOPAIR(" Z:",(float)endstops_trigsteps[Z_AXIS]/cs.axis_steps_per_unit[Z_AXIS]);
-//     LCD_MESSAGERPGM(CAT2(_T(MSG_ENDSTOPS_HIT),PSTR("Z")));
-        }
-        SERIAL_ECHOLN("");
-        endstop_x_hit=false;
-        endstop_y_hit=false;
-        endstop_z_hit=false;
+ if( endstop_x_hit || endstop_y_hit || endstop_z_hit) {
+   SERIAL_ECHO_START;
+   SERIAL_ECHORPGM(MSG_ENDSTOPS_HIT);
+   if(endstop_x_hit) {
+     SERIAL_ECHOPAIR(" X:",(float)endstops_trigsteps[X_AXIS]/cs.axis_steps_per_unit[X_AXIS]);
+//     LCD_MESSAGERPGM(CAT2((MSG_ENDSTOPS_HIT), PSTR("X")));
+   }
+   if(endstop_y_hit) {
+     SERIAL_ECHOPAIR(" Y:",(float)endstops_trigsteps[Y_AXIS]/cs.axis_steps_per_unit[Y_AXIS]);
+//     LCD_MESSAGERPGM(CAT2((MSG_ENDSTOPS_HIT), PSTR("Y")));
+   }
+   if(endstop_z_hit) {
+     SERIAL_ECHOPAIR(" Z:",(float)endstops_trigsteps[Z_AXIS]/cs.axis_steps_per_unit[Z_AXIS]);
+//     LCD_MESSAGERPGM(CAT2((MSG_ENDSTOPS_HIT),PSTR("Z")));
+   }
+   SERIAL_ECHOLN("");
+   endstop_x_hit=false;
+   endstop_y_hit=false;
+   endstop_z_hit=false;
 #if defined(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED) && defined(SDSUPPORT)
         if (abort_on_endstop_hit)
         {

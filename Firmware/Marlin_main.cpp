@@ -6629,6 +6629,7 @@ Sigma_Exit:
             }
 
             case 861: // M861 - Set/Read PINDA temperature compensation offsets
+            {
                 if (code_seen('?')) { // ? - Print out current EEPROM offset values
                     uint8_t cal_status = calibration_status_pinda();
                     int16_t usteps = 0;
@@ -6697,6 +6698,7 @@ Sigma_Exit:
                     SERIAL_PROTOCOLPGM("no valid command");
                 }
                 break;
+            }
 
 #endif //PINDA_THERMISTOR
 

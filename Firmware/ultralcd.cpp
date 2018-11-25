@@ -1882,14 +1882,16 @@ static void lcd_menu_extruder_info()
 
     lcd_timeoutToStatus.stop(); //infinite timeout
 
-    lcd_printf_P(_N(
-                     ESC_H(0,0)
-                     "Nozzle FAN: %4d RPM\n"
-                     "Print FAN:  %4d RPM\n"
-                 ),
-                 fan_speed_RPM[0],
-                 fan_speed_RPM[1]
-                );
+	lcd_printf_P(_N(
+	  ESC_H(0,0)
+	  "%S: %4d RPM\n"
+	  "%S:  %4d RPM\n"
+	 ),
+	 _i("Nozzle FAN"),
+	 fan_speed_RPM[0],
+	 _i("Print FAN"),
+	 fan_speed_RPM[1]
+	);
 
 #ifdef FILAMENT_SENSOR
     // Display X and Y difference from Filament sensor
@@ -1936,8 +1938,9 @@ static void lcd_menu_fails_stats_total()
     uint16_t filam = eeprom_read_word((uint16_t*)EEPROM_FERROR_COUNT_TOT);
     uint16_t crashX = eeprom_read_word((uint16_t*)EEPROM_CRASH_COUNT_X_TOT);
     uint16_t crashY = eeprom_read_word((uint16_t*)EEPROM_CRASH_COUNT_Y_TOT);
-    lcd_printf_P(PSTR(ESC_H(0,0) "Total failures" ESC_H(1,1) "Power failures  %-3d" ESC_H(1,2) "Filam. runouts  %-3d" ESC_H(1,3) "Crash  X %-3d  Y %-3d"), power, filam, crashX, crashY);
-    menu_back_if_clicked_fb();
+//	lcd_printf_P(PSTR(ESC_H(0,0) "Total failures" ESC_H(1,1) "Power failures  %-3d" ESC_H(1,2) "Filam. runouts  %-3d" ESC_H(1,3) "Crash  X %-3d  Y %-3d"), power, filam, crashX, crashY);
+	lcd_printf_P(PSTR(ESC_H(0,0) "%S" ESC_H(1,1) "%S  %-3d" ESC_H(1,2) "%S  %-3d" ESC_H(1,3) "%S  X %-3d  Y %-3d"), _i("Total failures"), _i("Power failures"), power, _i("Filam. runouts"), filam, _i("Crash"), crashX, crashY);
+	menu_back_if_clicked_fb();
 }
 
 static void lcd_menu_fails_stats_print()
@@ -1953,8 +1956,9 @@ static void lcd_menu_fails_stats_print()
     uint8_t filam = eeprom_read_byte((uint8_t*)EEPROM_FERROR_COUNT);
     uint8_t crashX = eeprom_read_byte((uint8_t*)EEPROM_CRASH_COUNT_X);
     uint8_t crashY = eeprom_read_byte((uint8_t*)EEPROM_CRASH_COUNT_Y);
-    lcd_printf_P(PSTR(ESC_H(0,0) "Last print failures" ESC_H(1,1) "Power failures  %-3d" ESC_H(1,2) "Filam. runouts  %-3d" ESC_H(1,3) "Crash  X %-3d  Y %-3d"), power, filam, crashX, crashY);
-    menu_back_if_clicked_fb();
+//	lcd_printf_P(PSTR(ESC_H(0,0) "Last print failures" ESC_H(1,1) "Power failures  %-3d" ESC_H(1,2) "Filam. runouts  %-3d" ESC_H(1,3) "Crash  X %-3d  Y %-3d"), power, filam, crashX, crashY);
+	lcd_printf_P(PSTR(ESC_H(0,0) "%S" ESC_H(1,1) "%S  %-3d" ESC_H(1,2) "%S  %-3d" ESC_H(1,3) "%S  X %-3d  Y %-3d"), _i("Last print failures"), _i("Power failures"), power, _i("Filam. runouts"), filam, _i("Crash"), crashX, crashY);
+	menu_back_if_clicked_fb();
 }
 /**
  * @brief Open fail statistics menu
@@ -1965,11 +1969,11 @@ static void lcd_menu_fails_stats_print()
  */
 static void lcd_menu_fails_stats()
 {
-    MENU_BEGIN();
-    MENU_ITEM_BACK_P(_T(MSG_MAIN));
-    MENU_ITEM_SUBMENU_P(PSTR("Last print"), lcd_menu_fails_stats_print);
-    MENU_ITEM_SUBMENU_P(PSTR("Total"), lcd_menu_fails_stats_total);
-    MENU_END();
+	MENU_BEGIN();
+	MENU_ITEM_BACK_P(_T(MSG_MAIN));
+	MENU_ITEM_SUBMENU_P(_i("Last print"), lcd_menu_fails_stats_print);
+	MENU_ITEM_SUBMENU_P(_i("Total"), lcd_menu_fails_stats_total);
+	MENU_END();
 }
 #elif defined(FILAMENT_SENSOR)
 /**
@@ -2027,9 +2031,9 @@ static void lcd_menu_temperatures()
 {
     lcd_timeoutToStatus.stop(); //infinite timeout
 
-    lcd_printf_P(PSTR(ESC_H(1,0) "Nozzle:   %d%c" ESC_H(1,1) "Bed:      %d%c"), (int)current_temperature[0], '\x01', (int)current_temperature_bed, '\x01');
+	lcd_printf_P(PSTR(ESC_H(1,0) "%S:   %d%c" ESC_H(1,1) "%S:      %d%c"), _i("Nozzle"), (int)current_temperature[0], '\x01', _i("Bed"), (int)current_temperature_bed, '\x01');
 #ifdef AMBIENT_THERMISTOR
-    lcd_printf_P(PSTR(ESC_H(1,2) "Ambient:  %d%c" ESC_H(1,3) "PINDA:    %d%c"), (int)current_temperature_ambient, '\x01', (int)current_temperature_pinda, '\x01');
+	lcd_printf_P(PSTR(ESC_H(1,2) "%S:  %d%c" ESC_H(1,3) "PINDA:    %d%c"), _i("Ambient"), (int)current_temperature_ambient, '\x01', (int)current_temperature_pinda, '\x01');
 #else //AMBIENT_THERMISTOR
     lcd_printf_P(PSTR(ESC_H(1,2) "PINDA:    %d%c"), (int)current_temperature_pinda, '\x01');
 #endif //AMBIENT_THERMISTOR
@@ -2055,7 +2059,7 @@ static void lcd_menu_voltages()
 #ifdef TMC2130
 static void lcd_menu_belt_status()
 {
-    lcd_printf_P(PSTR(ESC_H(1,0) "Belt status" ESC_H(2,1) "X %d" ESC_H(2,2) "Y %d" ), eeprom_read_word((uint16_t*)(EEPROM_BELTSTATUS_X)), eeprom_read_word((uint16_t*)(EEPROM_BELTSTATUS_Y)));
+    lcd_printf_P(PSTR(ESC_H(1,0) "%S" ESC_H(2,1) "X %d" ESC_H(2,2) "Y %d" ), _i("Belt status"), eeprom_read_word((uint16_t*)(EEPROM_BELTSTATUS_X)), eeprom_read_word((uint16_t*)(EEPROM_BELTSTATUS_Y)));
     menu_back_if_clicked();
 }
 #endif //TMC2130
@@ -2147,16 +2151,22 @@ static void lcd_support_menu()
           MENU_ITEM_BACK_P(PSTR("FW - " FW_version));
       }*/
 
-    MENU_ITEM_BACK_P(_i("prusa3d.com"));////MSG_PRUSA3D c=0 r=0
-    MENU_ITEM_BACK_P(_i("forum.prusa3d.com"));////MSG_PRUSA3D_FORUM c=0 r=0
-    MENU_ITEM_BACK_P(_i("howto.prusa3d.com"));////MSG_PRUSA3D_HOWTO c=0 r=0
-    MENU_ITEM_BACK_P(STR_SEPARATOR);
-    MENU_ITEM_BACK_P(PSTR(FILAMENT_SIZE));
-    MENU_ITEM_BACK_P(PSTR(ELECTRONICS));
-    MENU_ITEM_BACK_P(PSTR(NOZZLE_TYPE));
-    MENU_ITEM_BACK_P(STR_SEPARATOR);
-    MENU_ITEM_BACK_P(_i("Date:"));////MSG_DATE c=17 r=1
-    MENU_ITEM_BACK_P(PSTR(__DATE__));
+	MENU_ITEM_BACK_P(STR_SEPARATOR);
+	if (mmu_enabled)
+	{
+		MENU_ITEM_BACK_P(_i("MMU2 connected"));
+		MENU_ITEM_BACK_P(PSTR(" FW:"));
+		if (((menu_item - 1) == menu_line) && lcd_draw_update)
+		{
+		    lcd_set_cursor(6, menu_row);
+			if ((mmu_version > 0) && (mmu_buildnr > 0))
+				lcd_printf_P(PSTR("%d.%d.%d-%d"), mmu_version/100, mmu_version%100/10, mmu_version%10, mmu_buildnr);
+			else
+				lcd_puts_P(_i("unknown")); 
+		}
+	}
+	else
+		MENU_ITEM_BACK_P(PSTR("MMU2       N/A"));
 
     MENU_ITEM_BACK_P(STR_SEPARATOR);
     if (mmu_enabled)
@@ -4129,16 +4139,16 @@ void lcd_set_progress() {
 
 void menu_setlang(unsigned char lang)
 {
-    if (!lang_select(lang))
-    {
-        if (lcd_show_fullscreen_message_yes_no_and_wait_P(_i("Copy selected language from XFLASH?"), false, true))
-            lang_boot_update_start(lang);
-        lcd_update_enable(true);
-        lcd_clear();
-        menu_goto(lcd_language_menu, 0, true, true);
-        lcd_timeoutToStatus.stop(); //infinite timeout
-        lcd_draw_update = 2;
-    }
+	if (!lang_select(lang))
+	{
+		if (lcd_show_fullscreen_message_yes_no_and_wait_P(_i("Copy selected language?"), false, true))
+			lang_boot_update_start(lang);
+		lcd_update_enable(true);
+		lcd_clear();
+		menu_goto(lcd_language_menu, 0, true, true);
+		lcd_timeoutToStatus.stop(); //infinite timeout
+		lcd_draw_update = 2;
+	}
 }
 
 static void lcd_language_menu()
@@ -4739,15 +4749,15 @@ static bool settingsAutoDeplete()
     {
         if (!fsensor_enabled)
         {
-            if (menu_item_text_P(_i("Auto deplete[N/A]"))) return true;
+            if (menu_item_text_P(_i("SpoolJoin   [N/A]"))) return true;
         }
         else if (lcd_autoDeplete)
         {
-            if (menu_item_function_P(_i("Auto deplete [on]"), auto_deplete_switch)) return true;
+            if (menu_item_function_P(_i("SpoolJoin    [on]"), auto_deplete_switch)) return true;
         }
         else
         {
-            if (menu_item_function_P(_i("Auto deplete[off]"), auto_deplete_switch)) return true;
+            if (menu_item_function_P(_i("SpoolJoin   [off]"), auto_deplete_switch)) return true;
         }
     }
     return false;
@@ -5917,7 +5927,7 @@ static void lcd_main_menu()
     }
 
 #if defined(TMC2130) || defined(FILAMENT_SENSOR)
-    MENU_ITEM_SUBMENU_P(PSTR("Fail stats"), lcd_menu_fails_stats);
+  MENU_ITEM_SUBMENU_P(_i("Fail stats"), lcd_menu_fails_stats);
 #endif
 
     MENU_ITEM_SUBMENU_P(_i("Support"), lcd_support_menu);////MSG_SUPPORT c=0 r=0
