@@ -213,8 +213,8 @@ void mmu_loop(void)
         if (mmu_rx_start() > 0)
         {
 #ifdef MMU_DEBUG
-            puts_P(PSTR("MMU => 'start'"));
-            puts_P(PSTR("MMU <= 'S1'"));
+            puts_P(PSTR("MMU => MK3 'start'"));
+            puts_P(PSTR("MK3 => MMU 'S1'"));
 #endif //MMU_DEBUG
             mmu_puts_P(PSTR("S1\n")); //send 'read version' request
             mmu_state = -2;
@@ -229,10 +229,8 @@ void mmu_loop(void)
         if (mmu_rx_ok() > 0)
         {
             fscanf_P(uart2io, PSTR("%u"), &mmu_version); //scan version from buffer
-#ifdef MMU_DEBUG
-            printf_P(PSTR("MMU => '%dok'\n"), mmu_version);
-            puts_P(PSTR("MMU <= 'S2'"));
-#endif //MMU_DEBUG
+            printf_P(PSTR("MMU => MK3 '%dok'\n"), mmu_version);
+            puts_P(PSTR("MK3 => MMU 'S2'"));
             mmu_puts_P(PSTR("S2\n")); //send 'read buildnr' request
             mmu_state = -3;
         }
@@ -241,9 +239,7 @@ void mmu_loop(void)
         if (mmu_rx_ok() > 0)
         {
             fscanf_P(uart2io, PSTR("%u"), &mmu_buildnr); //scan buildnr from buffer
-#ifdef MMU_DEBUG
-            printf_P(PSTR("MMU => '%dok'\n"), mmu_buildnr);
-#endif //MMU_DEBUG
+            printf_P(PSTR("MMU => MK3 '%dok'\n"), mmu_buildnr);
             bool version_valid = mmu_check_version();
             if (!version_valid) mmu_show_warning();
             else puts_P(PSTR("MMU version valid"));
@@ -251,7 +247,7 @@ void mmu_loop(void)
             if ((PRINTER_TYPE == PRINTER_MK3) || (PRINTER_TYPE == PRINTER_MK3_SNMM))
             {
 #ifdef MMU_DEBUG
-                puts_P(PSTR("MMU <= 'P0'"));
+                puts_P(PSTR("MMU => MK3 'P0'"));
 #endif //MMU_DEBUG
                 mmu_puts_P(PSTR("P0\n")); //send 'read finda' request
                 mmu_state = -4;
@@ -259,7 +255,7 @@ void mmu_loop(void)
             else
             {
 #ifdef MMU_DEBUG
-                puts_P(PSTR("MMU <= 'M1'"));
+                puts_P(PSTR("MMU => MK3 'M1'"));
 #endif //MMU_DEBUG
                 mmu_puts_P(PSTR("M1\n")); //set mmu mode to stealth
                 mmu_state = -5;
@@ -271,7 +267,7 @@ void mmu_loop(void)
         if (mmu_rx_ok() > 0)
         {
 #ifdef MMU_DEBUG
-            puts_P(PSTR("MMU <= 'P0'"));
+            puts_P(PSTR("MMU => MK3 'P0'"));
 #endif //MMU_DEBUG
             mmu_puts_P(PSTR("P0\n")); //send 'read finda' request
             mmu_state = -4;
@@ -282,7 +278,7 @@ void mmu_loop(void)
         {
             fscanf_P(uart2io, PSTR("%hhu"), &mmu_finda); //scan finda from buffer
 #ifdef MMU_DEBUG
-            printf_P(PSTR("MMU => '%dok'\n"), mmu_finda);
+            printf_P(PSTR("MMU => MK3 '%dok'\n"), mmu_finda);
 #endif //MMU_DEBUG
             puts_P(PSTR("MMU - ENABLED"));
             fsensor_enable();
@@ -360,7 +356,7 @@ void mmu_loop(void)
                 filament = mmu_cmd - MMU_CMD_T0;
                 if (lastLoadedFilament != filament) {
                     toolChanges++;
-                    printf_P(PSTR("MMU <= 'T%d @toolChange:%d'\n"), filament, toolChanges);
+                    printf_P(PSTR("MK3 => MMU 'T%d @toolChange:%d'\n"), filament, toolChanges);
                     mmu_puts_P(PSTR("EE\n")); // Advise MMU CMD is correct, execute
                     mmu_state = 3; // wait for response
                 } else {
@@ -372,20 +368,20 @@ void mmu_loop(void)
             else if ((mmu_cmd >= MMU_CMD_L0) && (mmu_cmd <= MMU_CMD_L4))
             {
                 filament = mmu_cmd - MMU_CMD_L0;
-                printf_P(PSTR("MMU <= 'L%d'\n"), filament);
+                printf_P(PSTR("MK3 => MMU 'L%d'\n"), filament);
                 mmu_puts_P(PSTR("EE\n")); // Advise MMU CMD is correct, execute
                 mmu_state = 3; // wait for response
             }
             else if (mmu_cmd == MMU_CMD_C0)
             {
                 delay(100);
-                printf_P(PSTR("MMU <= 'C0'\n"));
+                printf_P(PSTR("MK3 => MMU 'C0'\n"));
                 mmu_puts_P(PSTR("EE\n")); // Advise MMU CMD is correct, execute
                 mmu_state = 3;
             }
             else if (mmu_cmd == MMU_CMD_U0)
             {
-                printf_P(PSTR("MMU <= 'U0'\n"));
+                printf_P(PSTR("MK3 => MMU 'U0'\n"));
                 mmu_puts_P(PSTR("EE\n")); // Advise MMU CMD is correct, execute
                 toolChanges = 0;
                 lastLoadedFilament = -10;
@@ -394,19 +390,19 @@ void mmu_loop(void)
             else if ((mmu_cmd >= MMU_CMD_E0) && (mmu_cmd <= MMU_CMD_E4))
             {
                 int filament = mmu_cmd - MMU_CMD_E0;
-                printf_P(PSTR("MMU <= 'E%d'\n"), filament);
+                printf_P(PSTR("MK3 => MMU 'E%d'\n"), filament);
                 mmu_puts_P(PSTR("EE\n")); // Advise MMU CMD is correct, execute
                 mmu_state = 3; // wait for response
             }
             else if (mmu_cmd == MMU_CMD_R0)
             {
-                printf_P(PSTR("MMU <= 'R0'\n"));
+                printf_P(PSTR("MK3 => MMU 'R0'\n"));
                 mmu_puts_P(PSTR("EE\n")); // Advise MMU CMD is correct, execute
                 mmu_state = 3; // wait for response
             }
             else if (mmu_cmd == MMU_CMD_FS)
             {
-                printf_P(PSTR("MMU <= 'Filament seen at extruder'\n"));
+                printf_P(PSTR("MK3 => MMU 'Filament seen at extruder'\n"));
                 mmu_puts_P(PSTR("EE\n"));
                 mmu_state = 3; // wait for response
             }
@@ -460,13 +456,13 @@ void mmu_loop(void)
     case 10: //echo response, comms confirmation
         if (mmu_rx_echo() > 0)
         {
-            printf_P(PSTR("MMU => 'CMD ACK 0x%2X'\n"), mmu_cmd);
+            printf_P(PSTR("MMU => MK3 'CMD ACK 0x%2X'\n"), mmu_cmd);
             ack_received = true;
             mmu_state = 1;            // Do normal Await command completion confirmation
-        } else if ((mmu_last_request + 1000) < millis()) {  // Timeout if echo doesn't match request, resend cmd
+        } /*else if ((mmu_last_request + 1000) < millis()) {  // Timeout if echo doesn't match request, resend cmd
             printf_P(PSTR("MMU => 'CMD RETRY 0x%2X'\n"), mmu_cmd);
             mmu_state = 1;
-        }
+        }*/
         return;
     }
 }
