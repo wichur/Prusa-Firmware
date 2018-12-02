@@ -16,7 +16,6 @@ extern int8_t mmu_finda;
 extern int16_t mmu_version;
 extern int16_t mmu_buildnr;
 
-
 #define MMU_CMD_NONE 0
 #define MMU_CMD_T0   0x10
 #define MMU_CMD_T1   0x11
@@ -38,16 +37,6 @@ extern int16_t mmu_buildnr;
 #define MMU_CMD_R0   0x60
 #define MMU_CMD_P0   0x70
 #define MMU_CMD_FS   0x81
-
-extern int mmu_puts_P(const char* str);
-
-extern int mmu_printf_P(const char* format, ...);
-
-extern int8_t mmu_rx_echo(void);
-
-extern int8_t mmu_rx_ok(void);
-
-extern int8_t mmu_rx_sensFilatBoot(void);
 
 extern void mmu_init(void);
 
