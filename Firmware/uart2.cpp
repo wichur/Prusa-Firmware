@@ -12,8 +12,8 @@ void uart2_init(void)
     //DDRH &=	~0x01;
     //PORTH |= 0x01;
     //rbuf_ini(uart2_ibuf, sizeof(uart2_ibuf) - 4);
-    
-    UCSR2A |= (1 << U2X2); // baudrate multiplier
+    cli();
+    UCSR2A = (0 << U2X2); // baudrate multiplier
     UCSR2B = (1 << RXEN2) | (1 << TXEN2) | (0 << UCSZ22); // enable receiver and transmitter
     UCSR2C = (0 << UMSEL21) | (0 << UMSEL20) | (0 << UPM21) |
     (0 << UPM20) | (1 << USBS2) |(1 << UCSZ21) | (1 << UCSZ20); // Use 8-bit character sizes
@@ -22,6 +22,7 @@ void uart2_init(void)
     UBRR2L = BAUD_PRESCALE; // Load lower 8-bits of the baud rate value into the low byte of the UBRR register
     
     UCSR2B |= (1 << RXCIE2); // enable rx interrupt
+    sei();
 }
 
 ISR(USART2_RX_vect)

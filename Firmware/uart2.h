@@ -2,10 +2,9 @@
 #ifndef _UART2_H
 #define _UART2_H
 
-#define USART_BAUDRATE  115200
+#define USART2_BAUDRATE  115200UL
 #define MMU_F_CPU       16000000UL
-#define BAUD_PRESCALE (((MMU_F_CPU / (USART_BAUDRATE * 8UL))) - 1)
-//#define UART_BAUD_SELECT(baudRate,xtalCpu) (((float)(xtalCpu))/(((float)(baudRate))*8.0)-1.0+0.5)
+#define BAUD_PRESCALE (((MMU_F_CPU / (USART2_BAUDRATE * 16UL))) - 1)
 #define ACK           "ACK"
 #define NAK           "NAK"
 #define BLK           (char)0x2D     // Blank data filler
