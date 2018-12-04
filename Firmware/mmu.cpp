@@ -258,7 +258,7 @@ void mmu_loop(void)
                   fsensor_autoload_enabled = true;
                   fsensor_autoload_check_stop();
                   mmu_state = 1;
-              } else {
+              } else if ((tData1 == 'O') && (tData2 == 'K')) {
                   if (mmuFSensorLoading == true) {
                       mmuFSensorLoading = false;
                       printf_P(PSTR("MMU => MK3 'ok :)'\n"));
