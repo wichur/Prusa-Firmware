@@ -51,30 +51,6 @@ int16_t mmu_buildnr = -1;
 uint32_t mmu_last_request = 0;
 uint32_t mmu_last_response = 0;
 
-/*//check 'ok' response
-int8_t mmu_rx_ok(void)
-{
-    int8_t res = uart2_rx_str_P(PSTR("ok\n"));
-    if (res == 1) mmu_last_response = millis();
-    return res;
-}
-
-//check 'MK3 FSensor requested to look for load' response
-int8_t mmu_rx_fsensorLook(void)
-{
-    int8_t res = uart2_rx_str_P(PSTR("fl\n"));
-    if (res == 1) mmu_last_response = millis();
-    return res;
-}
-
-//check 'start' response
-int8_t mmu_rx_start(void)
-{
-    int8_t res = uart2_rx_str_P(PSTR("start\n"));
-    if (res == 1) mmu_last_response = millis();
-    return res;
-}*/
-
 //initialize mmu2 unit - first part - should be done at begining of startup process
 void mmu_init(void)
 {
@@ -155,18 +131,14 @@ void mmu_loop(void)
               } // End of if STR
               return;
             case -2:
-              str
-              char temp_mmu_version =  tData1;
-              tData2, tData3};
-              sscanf(mmu_version, "%d", &temp_mmu_version);
+              mmu_version = (int)((tData1 << 8) || (tData2));
               printf_P(PSTR("MMU => MK3 '%dok'\n"), mmu_version);
               puts_P(PSTR("MK3 => MMU 'S2'"));
               uart2_txPayload("S2-");
               mmu_state = -3;
               return;
             case -3:
-              char temp_mmu_buildnr[3] = {tData1, tData2, tData3};
-              sscanf(mmu_buildnr, "%d", &temp_mmu_buildnr);
+              mmu_buildnr = (int)((tData1 << 8) || (tData2));
               printf_P(PSTR("MMU => MK3 '%dok'\n"), mmu_buildnr);
               bool version_valid = mmu_check_version();
               if (!version_valid) mmu_show_warning();
@@ -186,7 +158,7 @@ void mmu_loop(void)
               }
               return;
             case -4:
-              mmu_finda = (int8_t)tData3;
+              mmu_finda = (int)tData3;
 #ifdef MMU_DEBUG
               printf_P(PSTR("MMU => MK3 '%dok'\n"), mmu_finda);
 #endif //MMU_DEBUG
@@ -210,11 +182,11 @@ void mmu_loop(void)
                       if (lastLoadedFilament != filament) {
                           toolChanges++;
                           printf_P(PSTR("MK3 => MMU 'T%d @toolChange:%d'\n"), filament, toolChanges);
-                          unsigned char tempTxCMD[3] = {'T', (char)filament, BLK};
+                          unsigned char tempTxCMD[3] = {'T', filament, BLK};
                           uart2_txPayload(tempTxCMD);
                           mmu_state = 3; // wait for response
                       } else {
-                          unsigned char tempTxCMD[3] = {'T', (char)filament, BLK};
+                          unsigned char tempTxCMD[3] = {'T', filament, BLK};
                           uart2_txPayload(tempTxCMD);
                           mmu_state = 3;
                       }
@@ -223,7 +195,7 @@ void mmu_loop(void)
                   {
                       filament = mmu_cmd - MMU_CMD_L0;
                       printf_P(PSTR("MK3 => MMU 'L%d'\n"), filament);
-                      unsigned char tempLxCMD[3] = {'L', (char)filament, BLK};
+                      unsigned char tempLxCMD[3] = {'L', filament, BLK};
                       uart2_txPayload(tempLxCMD);
                       mmu_state = 3; // wait for response
                   } else if (mmu_cmd == MMU_CMD_C0)
@@ -242,7 +214,7 @@ void mmu_loop(void)
                   {
                       filament = mmu_cmd - MMU_CMD_E0;
                       printf_P(PSTR("MK3 => MMU 'E%d'\n"), filament);
-                      unsigned char tempExCMD[3] = {'E', (char)filament, BLK};
+                      unsigned char tempExCMD[3] = {'E', filament, BLK};
                       uart2_txPayload(tempExCMD);
                       mmu_state = 3; // wait for response
                   } else if (mmu_cmd == MMU_CMD_R0)
@@ -265,7 +237,7 @@ void mmu_loop(void)
               } // end of if mmu_cmd
               return;
             case 2:
-              mmu_finda = (int8_t)tData3;
+              mmu_finda = (int)tData3;
               if (!mmu_finda && CHECK_FINDA && fsensor_enabled) {
                   fsensor_stop_and_save_print();
                   enquecommand_front_P(PSTR("FSENSOR_RECOVER")); //then recover
@@ -280,7 +252,7 @@ void mmu_loop(void)
               return;
             case 3:
               if ((tData1 == 'F') && (tData2 == 'S')) {
-                  printf_P(PSTR("MMU => 'waiting for filament @ MK3 Sensor'\n"));
+                  printf_P(PSTR("MMU => MK3 'waiting for filament @ MK3 Sensor'\n"));
                   if (!fsensor_enabled) fsensor_enable();
                   mmuFSensorLoading = true;
                   fsensor_autoload_enabled = true;
@@ -318,7 +290,7 @@ void mmu_reset(void)
 int8_t mmu_set_filament_type(uint8_t extruder, uint8_t filament)
 {
     printf_P(PSTR("MMU <= 'F%d %d'\n"), extruder, filament);
-    char tempFx[3] = {'F', (char)extruder, (char)filament};
+    char tempFx[3] = {'F', extruder, filament};
     uart2_txPayload(tempFx);
 }
 
