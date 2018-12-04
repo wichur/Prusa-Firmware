@@ -5,9 +5,7 @@
 #define USART2_BAUDRATE  115200UL
 #define MMU_F_CPU       16000000UL
 #define BAUD_PRESCALE (((MMU_F_CPU / (USART2_BAUDRATE * 16UL))) - 1)
-#define ACK           "ACK"
-#define NAK           "NAK"
-#define BLK           (char)0x2D     // Blank data filler
+#define BLK           (byte)0x2D     // Blank data filler '-'
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -16,13 +14,13 @@
 #include "Arduino.h"
 
 extern volatile unsigned char rxData1, rxData2, rxData3, rxCSUM;
-extern volatile bool startRxFlag, confirmedPayload, txNACK;
-extern bool pendingACK;
+extern volatile bool startRxFlag, confirmedPayload, txNAKNext, txACKNext, txRESEND, pendingACK;
 
-extern char lastTxPayload[3];
-
-extern void uart2_init(void);
+extern unsigned char lastTxPayload[3];
 
 extern void uart2_txPayload(unsigned char payload[3]);
+extern void uart2_txACK(bool ACK = true);
+
+extern void uart2_init(void);
 
 #endif //_UART2_H
