@@ -4,15 +4,13 @@ before_install:
 script:
   - bash -x test.sh
   - bash -x build.sh
-  - rm Firmware/Configuration_prusa.h
-  - cp Firmware/variants/1_75mm_MK25-RAMBo13a-E3Dv6full.h Firmware/Configuration_prusa.h
-  - bash -x build.sh
-  - rm Firmware/Configuration_prusa.h
-  - cp Firmware/variants/1_75mm_MK25-RAMBo10a-E3Dv6full.h Firmware/Configuration_prusa.h
-  - bash -x build.sh
-  - rm Firmware/Configuration_prusa.h
-  - cp Firmware/variants/1_75mm_MK2-RAMBo13a-E3Dv6full.h Firmware/Configuration_prusa.h
-  - bash -x build.sh
-  - rm Firmware/Configuration_prusa.h
-  - cp Firmware/variants/1_75mm_MK2-RAMBo10a-E3Dv6full.h Firmware/Configuration_prusa.h
-  - bash -x build.sh
+before_deploy:
+  - cd /home/travis/build/vertigo235/Prusa-Firmware/lang
+deploy:
+  provider: releases
+  api_key: '$GITHUB_API_KEY'
+  file: 
+    - 'firmware.hex'
+  skip_cleanup: true
+  on:
+    all_branches: true
