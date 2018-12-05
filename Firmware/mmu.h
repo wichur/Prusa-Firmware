@@ -11,7 +11,7 @@ extern uint8_t mmu_extruder;
 
 extern uint8_t tmp_extruder;
 
-extern int8_t mmu_finda;
+extern bool mmu_finda;
 
 extern int16_t mmu_version;
 extern int16_t mmu_buildnr;

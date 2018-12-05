@@ -30,7 +30,9 @@ ISR(USART2_RX_vect)
 {
   cli();
   readRxBuffer = UDR2;
+#ifdef MMU_DEBUG
   printf_P(PSTR("\nUART2 RX 0x%2X\n"), readRxBuffer);
+#endif //MMU_DEBUG
   if ((readRxBuffer == 0x7F) && (!startRxFlag)) {// check for start of framing bytes
     startRxFlag = true;
     rxCount = 0;
@@ -67,24 +69,24 @@ ISR(USART2_RX_vect)
 
 void uart2_txPayload(unsigned char payload[3])
 {
-  for (int i = 0; i < 3; i++) lastTxPayload[i] = payload[i];  // Backup incase resend on NACK
+  printf_P(PSTR("\nUART2 TX 0x%2X %2X %2X\n"), payload[0], payload[1], payload[2]);
   unsigned char csum = 0;
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = 0x7F;                            // Start byte 0x7F
-  delay(10);
+  delay(2);
   for (int i = 0; i < 3; i++) {           // Send data
     loop_until_bit_is_set(UCSR2A, UDRE2); // Do nothing until UDR is ready for more data to be written to it
     UDR2 = (0xFF & payload[i]);
-    delay(10);
+    delay(2);
     csum += (0xFF & payload[i]);
   }
   csum = 0x2D; //(csum/3);
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = (0xFF & csum);
-  delay(10);// Send Checksum
+  delay(2);// Send Checksum
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = 0x7F;
-  delay(10);// End byte
+  delay(2);// End byte
   pendingACK = true;                      // Set flag to wait for ACK
 }
 
