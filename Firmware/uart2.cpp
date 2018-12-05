@@ -10,9 +10,6 @@ byte lastTxPayload[3] = {0, 0, 0};
 
 void uart2_init(void)
 {
-    //DDRH &=	~0x01;
-    //PORTH |= 0x01;
-    //rbuf_ini(uart2_ibuf, sizeof(uart2_ibuf) - 4);
     cli();
     UCSR2A = (0 << U2X2); // baudrate multiplier
     UCSR2B = (1 << RXEN2) | (1 << TXEN2) | (0 << UCSZ22); // enable receiver and transmitter
@@ -69,24 +66,26 @@ ISR(USART2_RX_vect)
 
 void uart2_txPayload(unsigned char payload[3])
 {
+#ifdef MMU_DEBUG
   printf_P(PSTR("\nUART2 TX 0x%2X %2X %2X\n"), payload[0], payload[1], payload[2]);
+#endif //MMU_DEBUG
   unsigned char csum = 0;
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = 0x7F;                            // Start byte 0x7F
-  delay(2);
+  //delay(2);
   for (int i = 0; i < 3; i++) {           // Send data
     loop_until_bit_is_set(UCSR2A, UDRE2); // Do nothing until UDR is ready for more data to be written to it
     UDR2 = (0xFF & payload[i]);
-    delay(2);
+    //delay(2);
     csum += (0xFF & payload[i]);
   }
   csum = 0x2D; //(csum/3);
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = (0xFF & csum);
-  delay(2);// Send Checksum
+  //delay(2);// Send Checksum
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = 0x7F;
-  delay(2);// End byte
+  //delay(2);// End byte
   pendingACK = true;                      // Set flag to wait for ACK
 }
 
