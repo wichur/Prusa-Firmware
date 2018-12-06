@@ -294,9 +294,17 @@ bool fsensor_check_autoload(void)
     if ((fsensor_autoload_c >= 12) && (fsensor_autoload_sum > 20))
     {
         if (mmu_enabled) {
-            mmu_command(MMU_CMD_FS);
-            fsensor_autoload_check_stop();
-            fsensor_autoload_enabled = false;
+            if (mmuFSensorLoading) {
+                mmu_command(MMU_CMD_FS);
+                fsensor_autoload_check_stop();
+                fsensor_autoload_enabled = false;
+            } else if (mmuIdleFilamentTesting) {
+                lcd_clear();
+                lcd_set_cursor(6, 2);
+                lcd_puts_P(_T(MSG_ENDSTOP_HIT));
+                delay(2000);
+                lcd_clear();
+            }
         }
         return true;
     }

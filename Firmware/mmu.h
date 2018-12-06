@@ -5,6 +5,7 @@
 
 extern bool mmu_enabled;
 extern bool mmuFSensorLoading;
+extern bool mmuIdleFilamentTesting;
 extern int8_t mmu_state;
 
 extern uint8_t mmu_extruder;
@@ -15,6 +16,7 @@ extern bool mmu_finda;
 
 extern int16_t mmu_version;
 extern int16_t mmu_buildnr;
+extern uint32_t mmu_last_request;
 
 #define MMU_CMD_NONE 0
 #define MMU_CMD_T0   0x10

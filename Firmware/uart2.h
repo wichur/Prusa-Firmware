@@ -11,10 +11,12 @@
 #include <stdio.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "mmu.h"
 #include "Arduino.h"
 
-extern volatile unsigned char rxData1, rxData2, rxData3, rxCSUM;
-extern volatile bool startRxFlag, confirmedPayload, txNAKNext, txACKNext, txRESEND, pendingACK;
+extern volatile unsigned char rxData1, rxData2, rxData3, rxCSUM1, rxCSUM2;
+extern volatile bool startRxFlag, confirmedPayload, txNAKNext, txACKNext,
+  txRESEND, pendingACK;
 
 extern unsigned char lastTxPayload[3];
 

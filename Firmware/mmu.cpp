@@ -35,6 +35,7 @@ bool mmu_ready = false;
 bool last_conf = false; // For comms debug
 bool isMMUPrintPaused = false;
 bool mmuFSensorLoading = false;
+bool mmuIdleFilamentTesting = true;
 int lastLoadedFilament = -10;
 int8_t mmu_state = 0;
 int8_t last_state = -10;
@@ -92,7 +93,7 @@ void mmu_loop(void)
     unsigned char tData1 = rxData1;                  // Copy volitale vars as local
     unsigned char tData2 = rxData2;
     unsigned char tData3 = rxData3;
-    unsigned char  tCSUM =  rxCSUM;
+    int16_t  tCSUM = ((rxCSUM1 << 8) | rxCSUM2);
     bool     confPayload = confirmedPayload;
     if (txRESEND) {
         txRESEND         = false;
@@ -101,18 +102,16 @@ void mmu_loop(void)
         uart2_txPayload(lastTxPayload);
         return;
     }
-    if ((confPayload && !(tCSUM == 0x2D)) || txNAKNext) { // If confirmed with bad CSUM or NACK return has been requested
-        confirmedPayload = false;
-        startRxFlag      = false;
+#ifdef MMU_DEBUG
+    if (confPayload) printf_P(PSTR("MMU Pre-Conf Payload,0x%2X %2X %2X %2X%2X\n"), tData1, tData2, tData3, (tCSUM >> 8), tCSUM);
+#endif //MMU_DEBUG
+    if ((confPayload && !(tCSUM == (tData1 + tData2 + tData3))) || txNAKNext) { // If confirmed with bad CSUM or NACK return has been requested
         uart2_txACK(false); // Send NACK Byte
 #ifdef MMU_DEBUG
         puts_P(PSTR("Non-Conf Payload"));
 #endif //MMU_DEBUG
     } else if (confPayload) {
-        confirmedPayload = false;
-        startRxFlag      = false;
         uart2_txACK();      // Send  ACK Byte
-
 
 
         mmu_last_response = millis(); // Update last response counter      
@@ -208,6 +207,7 @@ void mmu_loop(void)
             if ((mmu_cmd >= MMU_CMD_T0) && (mmu_cmd <= MMU_CMD_T4))
             {
                 filament = mmu_cmd - MMU_CMD_T0;
+                mmuIdleFilamentTesting = false;
                 if (lastLoadedFilament != filament) {
                     toolChanges++;
                     printf_P(PSTR("MK3 => MMU 'T%d @toolChange:%d'\n"), filament, toolChanges);
@@ -234,6 +234,7 @@ void mmu_loop(void)
                 mmu_state = 3;
             } else if (mmu_cmd == MMU_CMD_U0)
             {
+                mmuIdleFilamentTesting = true;
                 printf_P(PSTR("MK3 => MMU 'U0'\n"));
                 uart2_txPayload("U0-");
                 toolChanges = 0;
@@ -255,6 +256,7 @@ void mmu_loop(void)
             {
                 printf_P(PSTR("MK3 => MMU 'Filament seen at extruder'\n"));
                 uart2_txPayload("FS-");
+                fsensor_autoload_enabled = false;
                 mmu_state = 3; // wait for response
             }
             mmu_cmd = 0;
@@ -642,8 +644,6 @@ void extr_adj(int extruder) //loading filament for SNMM
     lcd_clear();
     lcd_set_cursor(0, 1);
     lcd_puts_P(_T(MSG_LOADING_FILAMENT));
-    //if(strlen(_T(MSG_LOADING_FILAMENT))>18) lcd.setCursor(0, 1);
-    //else lcd.print(" ");
     lcd_print(" ");
     lcd_print(extruder + 1);
 
