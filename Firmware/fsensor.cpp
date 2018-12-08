@@ -302,7 +302,7 @@ bool fsensor_check_autoload(void)
                 lcd_clear();
                 lcd_set_cursor(6, 2);
                 lcd_puts_P(_T(MSG_ENDSTOP_HIT));
-                delay(2000);
+                delay(1000);
                 lcd_clear();
             }
         }

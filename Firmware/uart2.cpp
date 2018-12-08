@@ -77,28 +77,22 @@ void uart2_txPayload(unsigned char payload[3])
   uint16_t csum = 0;
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = 0x7F;                            // Start byte 0x7F
-  //delay(2);
   for (int i = 0; i < 3; i++) {           // Send data
     loop_until_bit_is_set(UCSR2A, UDRE2); // Do nothing until UDR is ready for more data to be written to it
     UDR2 = payload[i];
     csum += payload[i];
-    //delay(2);
   }
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = ((0xFFFF & csum) >> 8);
-  //delay(2);
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = (0xFF & csum);
-  //delay(2);
   loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
   UDR2 = 0xF7;
-  //delay(2);
   pendingACK = true;                      // Set flag to wait for ACK
 }
 
 void uart2_txACK(bool ACK)
 {
-  mmu_last_request = millis();
   confirmedPayload = false;
   startRxFlag      = false;
   if (ACK) {

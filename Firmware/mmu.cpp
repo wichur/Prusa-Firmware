@@ -173,18 +173,22 @@ void mmu_loop(void)
         } else if (mmu_state == 2) {
             mmu_finda = (tData3 != 0x00) ? true : false;
             if (!mmu_finda && CHECK_FINDA && fsensor_enabled) {
+#ifdef OCTO_NOTIFICATIONS_ON
+                printf_P(PSTR("// action:m600\n"));
+#endif // OCTO_NOTIFICATIONS_ON
                 fsensor_stop_and_save_print();
                 enquecommand_front_P(PSTR("FSENSOR_RECOVER")); //then recover
                 if (lcd_autoDepleteEnabled()) enquecommand_front_P(PSTR("M600 AUTO")); //save print and run M600 command
                 else enquecommand_front_P(PSTR("M600")); //save print and run M600 command
             }
             mmu_state = 1;
-            if ((mmu_last_request + MMU_P0_TIMEOUT) < millis())
-            {   //resend request after timeout (30s)
-                mmu_state = 1;
-            }
         } else if (mmu_state == 3) {
             if ((tData1 == 'F') && (tData2 == 'S')) {
+#ifdef TMC2130
+                //re-enable extruder motor
+                tmc2130_set_pwr(E_AXIS, 1);
+                printf_P(PSTR("E-axis enabled\n"));
+#endif //TMC2130
                 printf_P(PSTR("MMU => MK3 'waiting for filament @ MK3 Sensor'\n"));
                 if (!fsensor_enabled) fsensor_enable();
                 fsensor_autoload_enabled = true;
@@ -202,71 +206,75 @@ void mmu_loop(void)
         } // End of mmu_state if statement
     } // End of ConfPayload Area
 
-    if (mmu_state == 1) {
-        if (mmu_cmd) {
-            if ((mmu_cmd >= MMU_CMD_T0) && (mmu_cmd <= MMU_CMD_T4))
-            {
-                filament = mmu_cmd - MMU_CMD_T0;
-                mmuIdleFilamentTesting = false;
-                if (lastLoadedFilament != filament) {
-                    toolChanges++;
-                    printf_P(PSTR("MK3 => MMU 'T%d @toolChange:%d'\n"), filament, toolChanges);
-                    unsigned char tempTxCMD[3] = {'T', filament, BLK};
-                    uart2_txPayload(tempTxCMD);
-                    mmu_state = 3; // wait for response
-                } else {
-                    unsigned char tempTxCMD[3] = {'T', filament, BLK};
-                    uart2_txPayload(tempTxCMD);
-                    mmu_state = 3;
-                }
-                lastLoadedFilament = filament;
-            } else if ((mmu_cmd >= MMU_CMD_L0) && (mmu_cmd <= MMU_CMD_L4))
-            {
-                filament = mmu_cmd - MMU_CMD_L0;
-                printf_P(PSTR("MK3 => MMU 'L%d'\n"), filament);
-                unsigned char tempLxCMD[3] = {'L', filament, BLK};
-                uart2_txPayload(tempLxCMD);
+    if ((mmu_state == 1) && mmu_cmd) {
+        if ((mmu_cmd >= MMU_CMD_T0) && (mmu_cmd <= MMU_CMD_T4))
+        {
+            filament = mmu_cmd - MMU_CMD_T0;
+            mmuIdleFilamentTesting = false;
+            if (lastLoadedFilament != filament) {
+#ifdef TMC2130
+                //disable extruder motor
+                tmc2130_set_pwr(E_AXIS, 0);
+                printf_P(PSTR("E-axis enabled\n"));
+#endif //TMC2130
+                toolChanges++;
+                printf_P(PSTR("MK3 => MMU 'T%d @toolChange:%d'\n"), filament, toolChanges);
+                unsigned char tempTxCMD[3] = {'T', filament, BLK};
+                uart2_txPayload(tempTxCMD);
                 mmu_state = 3; // wait for response
-            } else if (mmu_cmd == MMU_CMD_C0)
-            {
-                printf_P(PSTR("MK3 => MMU 'C0'\n"));
-                uart2_txPayload("C0-");
+            } else {
+                unsigned char tempTxCMD[3] = {'T', filament, BLK};
+                uart2_txPayload(tempTxCMD);
                 mmu_state = 3;
-            } else if (mmu_cmd == MMU_CMD_U0)
-            {
-                mmuIdleFilamentTesting = true;
-                printf_P(PSTR("MK3 => MMU 'U0'\n"));
-                uart2_txPayload("U0-");
-                toolChanges = 0;
-                lastLoadedFilament = -10;
-                mmu_state = 3;
-            } else if ((mmu_cmd >= MMU_CMD_E0) && (mmu_cmd <= MMU_CMD_E4))
-            {
-                filament = mmu_cmd - MMU_CMD_E0;
-                printf_P(PSTR("MK3 => MMU 'E%d'\n"), filament);
-                unsigned char tempExCMD[3] = {'E', filament, BLK};
-                uart2_txPayload(tempExCMD);
-                mmu_state = 3; // wait for response
-            } else if (mmu_cmd == MMU_CMD_R0)
-            {
-                printf_P(PSTR("MK3 => MMU 'R0'\n"));
-                uart2_txPayload("R0-");
-                mmu_state = 3; // wait for response
-            } else if (mmu_cmd == MMU_CMD_FS)
-            {
-                printf_P(PSTR("MK3 => MMU 'Filament seen at extruder'\n"));
-                uart2_txPayload("FS-");
-                fsensor_autoload_enabled = false;
-                mmu_state = 3; // wait for response
             }
-            mmu_cmd = 0;
-        } else if (((mmu_last_response + 500) < millis()) && !mmuFSensorLoading) { //request every 500ms
-            uart2_txPayload("P0-");
-            mmu_state = 2;
-        } else if (((mmu_last_response + 500) < millis()) && mmuFSensorLoading) {
-            if (!fsensor_enabled) fsensor_enable();
-        } // end of if mmu_cmd
-    }
+            lastLoadedFilament = filament;
+        } else if ((mmu_cmd >= MMU_CMD_L0) && (mmu_cmd <= MMU_CMD_L4))
+        {
+            filament = mmu_cmd - MMU_CMD_L0;
+            printf_P(PSTR("MK3 => MMU 'L%d'\n"), filament);
+            unsigned char tempLxCMD[3] = {'L', filament, BLK};
+            uart2_txPayload(tempLxCMD);
+            mmu_state = 3; // wait for response
+        } else if (mmu_cmd == MMU_CMD_C0)
+        {
+            printf_P(PSTR("MK3 => MMU 'C0'\n"));
+            uart2_txPayload("C0-");
+            mmu_state = 3;
+        } else if (mmu_cmd == MMU_CMD_U0)
+        {
+            mmuIdleFilamentTesting = true;
+            printf_P(PSTR("MK3 => MMU 'U0'\n"));
+            uart2_txPayload("U0-");
+            toolChanges = 0;
+            lastLoadedFilament = -10;
+            mmu_state = 3;
+        } else if ((mmu_cmd >= MMU_CMD_E0) && (mmu_cmd <= MMU_CMD_E4))
+        {
+            filament = mmu_cmd - MMU_CMD_E0;
+            printf_P(PSTR("MK3 => MMU 'E%d'\n"), filament);
+            unsigned char tempExCMD[3] = {'E', filament, BLK};
+            uart2_txPayload(tempExCMD);
+            mmu_state = 3; // wait for response
+        } else if (mmu_cmd == MMU_CMD_R0)
+        {
+            printf_P(PSTR("MK3 => MMU 'R0'\n"));
+            uart2_txPayload("R0-");
+            mmu_state = 3; // wait for response
+        } else if (mmu_cmd == MMU_CMD_FS)
+        {
+            printf_P(PSTR("MK3 => MMU 'Filament seen at extruder'\n"));
+            uart2_txPayload("FS-");
+            fsensor_autoload_enabled = false;
+            mmu_state = 3; // wait for response
+        }
+        mmu_cmd = 0;
+    } else if (((mmu_last_response + 500) < millis()) && !mmuFSensorLoading && (mmu_state == 1)) {
+        //request every 500ms
+        uart2_txPayload("P0-");
+        mmu_state = 2;
+    } else if (((mmu_last_response + 500) < millis()) && mmuFSensorLoading && (mmu_state == 1)) {
+        if (!fsensor_enabled) fsensor_enable();
+    } // end of if mmu_cmd
 }
 
 
@@ -291,6 +299,7 @@ int8_t mmu_set_filament_type(uint8_t extruder, uint8_t filament)
 
 void mmu_command(uint8_t cmd)
 {
+    mmu_last_request = millis();
     mmu_cmd = cmd;
     mmu_ready = false;
 }
@@ -334,6 +343,11 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
                     lcd_update_was_enabled = true;
                     lcd_update_enable(false);
                 }
+#ifdef TMC2130
+                //disable extruder motor
+                tmc2130_set_pwr(E_AXIS, 0);
+                printf_P(PSTR("E-axis enabled\n"));
+#endif //TMC2130
                 st_synchronize();
                 mmu_print_saved = true;
 #ifdef OCTO_NOTIFICATIONS_ON
@@ -433,7 +447,7 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
 #ifdef TMC2130
     //enable extruder motor (disabled in mmu_command, start of T-code processing)
     tmc2130_set_pwr(E_AXIS, 1);
-    //printf_P(PSTR("E-axis enabled\n"));
+    printf_P(PSTR("E-axis enabled\n"));
 #endif //TMC2130
 }
 
@@ -472,9 +486,6 @@ void mmu_M600_wait_and_beep() {
     //Beep and wait for user to remove old filament and prepare new filament for load
 
     KEEPALIVE_STATE(PAUSED_FOR_USER);
-#ifdef OCTO_NOTIFICATIONS_ON
-    printf_P(PSTR("// action:m600\n"));
-#endif // OCTO_NOTIFICATIONS_ON
 
     int counterBeep = 0;
     lcd_display_message_fullscreen_P(_i("Remove old filament and press the knob to start loading new filament."));
