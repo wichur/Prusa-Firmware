@@ -251,6 +251,7 @@ void mmu_loop(void)
         } else if ((mmu_cmd >= MMU_CMD_E0) && (mmu_cmd <= MMU_CMD_E4))
         {
             filament = mmu_cmd - MMU_CMD_E0;
+            lastLoadedFilament = -10;
             printf_P(PSTR("MK3 => MMU 'E%d'\n"), filament);
             unsigned char tempExCMD[3] = {'E', filament, BLK};
             uart2_txPayload(tempExCMD);
@@ -541,10 +542,7 @@ void mmu_M600_load_filament(bool automatic)
     lcd_print(tmp_extruder + 1);
     snmm_filaments_used |= (1 << tmp_extruder); //for stop print
 
-//      printf_P(PSTR("T code: %d \n"), tmp_extruder);
-//      mmu_printf_P(PSTR("T%d\n"), tmp_extruder);
     mmu_command(MMU_CMD_T0 + tmp_extruder);
-
     manage_response(false, true);
     mmu_command(MMU_CMD_C0);
     mmu_extruder = tmp_extruder; //filament change is finished

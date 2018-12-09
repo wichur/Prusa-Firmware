@@ -3057,15 +3057,13 @@ static void gcode_M600(bool automatic, float x_position, float y_position, float
             }
         }
         mmu_M600_load_filament(automatic);
-    }
-    else
-        M600_load_filament();
+    } else M600_load_filament();
 
     if (!automatic) M600_check_state();
 
     lcd_update_enable(true);
 
-    //Not let's go back to print
+    //Now let's go back to print
     fanSpeed = fanSpeedBckp;
 
     //Feed a little of filament to stabilize pressure
