@@ -132,13 +132,15 @@ void mmu_loop(void)
             } // End of if STR
         } else if (mmu_state == -2) {
             mmu_version = ((tData1 << 8) | (tData2));
-            printf_P(PSTR("MMU => MK3 '%dok'\n"), mmu_version);
+            printf_P(PSTR("MMU => MK3 '%d'\n"), mmu_version);
+#ifdef MMU_DEBUG
             puts_P(PSTR("MK3 => MMU 'S2'"));
+#endif //MMU_DEBUG
             uart2_txPayload("S2-");
             mmu_state = -3;
         } else if (mmu_state == -3) {
             mmu_buildnr = ((tData1 << 8) | (tData2));
-            printf_P(PSTR("MMU => MK3 '%dok'\n"), mmu_buildnr);
+            printf_P(PSTR("MMU => MK3 '%d'\n"), mmu_buildnr);
             bool version_valid = mmu_check_version();
             if (!version_valid) mmu_show_warning();
             else puts_P(PSTR("MMU version valid"));
@@ -215,7 +217,7 @@ void mmu_loop(void)
 #ifdef TMC2130
                 //disable extruder motor
                 tmc2130_set_pwr(E_AXIS, 0);
-                printf_P(PSTR("E-axis enabled\n"));
+                printf_P(PSTR("E-axis disabled\n"));
 #endif //TMC2130
                 toolChanges++;
                 printf_P(PSTR("MK3 => MMU 'T%d @toolChange:%d'\n"), filament, toolChanges);
@@ -252,6 +254,11 @@ void mmu_loop(void)
         {
             filament = mmu_cmd - MMU_CMD_E0;
             lastLoadedFilament = -10;
+#ifdef TMC2130
+            //disable extruder motor
+            tmc2130_set_pwr(E_AXIS, 0);
+            printf_P(PSTR("E-axis disabled\n"));
+#endif //TMC2130
             printf_P(PSTR("MK3 => MMU 'E%d'\n"), filament);
             unsigned char tempExCMD[3] = {'E', filament, BLK};
             uart2_txPayload(tempExCMD);
@@ -347,7 +354,7 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
 #ifdef TMC2130
                 //disable extruder motor
                 tmc2130_set_pwr(E_AXIS, 0);
-                printf_P(PSTR("E-axis enabled\n"));
+                printf_P(PSTR("E-axis disabled\n"));
 #endif //TMC2130
                 st_synchronize();
                 mmu_print_saved = true;
