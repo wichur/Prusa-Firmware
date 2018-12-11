@@ -241,7 +241,7 @@ bool Config_RetrieveSettings()
         if (cs.max_jerk[Y_AXIS] > DEFAULT_YJERK) cs.max_jerk[Y_AXIS] = DEFAULT_YJERK;
         calculate_extruder_multipliers();
 
-		//if max_feedrate_silent and max_acceleration_units_per_sq_second_silent were never stored to eeprom, use default values:
+        //if max_feedrate_silent and max_acceleration_units_per_sq_second_silent were never stored to eeprom, use default values:
         for (uint8_t i = 0; i < (sizeof(cs.max_feedrate_silent)/sizeof(cs.max_feedrate_silent[0])); ++i)
         {
             const uint32_t erased = 0xffffffff;

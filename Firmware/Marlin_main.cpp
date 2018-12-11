@@ -7536,11 +7536,11 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) //default argument s
         if (mmuFSensorLoading) {
             fsensor_check_autoload();
         } else if ((mcode_in_progress != 600) && (!moves_planned() && !IS_SD_PRINTING &&
-          !is_usb_printing && (lcd_commands_type != LCD_COMMAND_V2_CAL) && !wizard_active)
-          && mmuIdleFilamentTesting) {
+                   !is_usb_printing && (lcd_commands_type != LCD_COMMAND_V2_CAL) && !wizard_active)
+                   && mmuIdleFilamentTesting) {
             if (!fsensor_enabled) fsensor_enable();
             fsensor_autoload_enabled = true;
-            fsensor_check_autoload(); 
+            fsensor_check_autoload();
         } else fsensor_autoload_enabled = false;
     }
 #endif //FILAMENT_SENSOR

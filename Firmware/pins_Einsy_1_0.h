@@ -153,7 +153,8 @@
 //#define LOGIC_ANALYZER_SERIAL_TX_WRITE_NC(C) do { if (C & 0x100) UCSR2B |= 1; else UCSR2B &= ~1; UDR2 = C; } while (0)
 /*#define LOGIC_ANALYZER_SERIAL_TX_WRITE(C) do { \
 	/* Wait for empty transmit buffer */ \
-	//while (!(UCSR2A & (1<<UDRE2))); \
-	/* Put data into buffer, sends the data */ \
-	LOGIC_ANALYZER_SERIAL_TX_WRITE_NC(C); \
+//while (!(UCSR2A & (1<<UDRE2))); \
+/* Put data into buffer, sends the data */ \
+LOGIC_ANALYZER_SERIAL_TX_WRITE_NC(C);
+\
 } while (0)*/
