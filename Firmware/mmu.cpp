@@ -19,8 +19,6 @@
 #endif //TMC2130
 
 #define CHECK_FINDA ((IS_SD_PRINTING || is_usb_printing) && (mcode_in_progress != 600) && !saved_printing && e_active())
-#define mmu_disable_e0() WRITE(E0_ENABLE_PIN,LOW)
-#define mmu_enable_e0() WRITE(E0_ENABLE_PIN,HIGH)
 
 #define MMU_TODELAY 100
 #define MMU_TIMEOUT 10
@@ -190,7 +188,7 @@ void mmu_loop(void)
             if ((tData1 == 'F') && (tData2 == 'S')) {
 #ifdef TMC2130
                 //re-enable extruder motor
-                mmu_enable_e0(); // E0 ena pin toggle
+                enable_e0(); // E0 ena pin toggle
                 printf_P(PSTR("E-axis enabled\n"));
 #endif //TMC2130
                 printf_P(PSTR("MMU => MK3 'waiting for filament @ MK3 Sensor'\n"));
@@ -219,7 +217,7 @@ void mmu_loop(void)
             if (lastLoadedFilament != filament) {
 #ifdef TMC2130
                 //disable extruder motor
-                mmu_disable_e0();
+                disable_e0();
                 printf_P(PSTR("E-axis disabled\n"));
 #endif //TMC2130
                 toolChanges++;
@@ -259,7 +257,7 @@ void mmu_loop(void)
             lastLoadedFilament = -10;
 #ifdef TMC2130
             //disable extruder motor
-            mmu_disable_e0();
+            disable_e0();
             printf_P(PSTR("E-axis disabled\n"));
 #endif //TMC2130
             printf_P(PSTR("MK3 => MMU 'E%d'\n"), filament);
@@ -356,7 +354,7 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
                 }
 #ifdef TMC2130
                 //disable extruder motor
-                mmu_disable_e0();
+                disable_e0();
                 printf_P(PSTR("E-axis disabled\n"));
 #endif //TMC2130
                 st_synchronize();
@@ -457,7 +455,7 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
     if (lcd_update_was_enabled) lcd_update_enable(true);
 #ifdef TMC2130
     //enable extruder motor (disabled in mmu_command, start of T-code processing)
-    mmu_enable_e0();
+    enable_e0();
     printf_P(PSTR("E-axis enabled\n"));
 #endif //TMC2130
 }
