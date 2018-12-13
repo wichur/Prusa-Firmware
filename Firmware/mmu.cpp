@@ -19,6 +19,8 @@
 #endif //TMC2130
 
 #define CHECK_FINDA ((IS_SD_PRINTING || is_usb_printing) && (mcode_in_progress != 600) && !saved_printing && e_active())
+#define mmu_disable_e0() WRITE(E0_ENABLE_PIN,LOW)
+#define mmu_enable_e0() WRITE(E0_ENABLE_PIN,HIGH)
 
 #define MMU_TODELAY 100
 #define MMU_TIMEOUT 10
@@ -114,7 +116,6 @@ void mmu_loop(void)
         uart2_txACK();      // Send  ACK Byte
 
 
-        mmu_last_response = millis(); // Update last response counter
 #ifdef MMU_DEBUG
         printf_P(PSTR("MMU Conf Payload, state=%d\n"), mmu_state);
 #endif //MMU_DEBUG
@@ -124,6 +125,7 @@ void mmu_loop(void)
                 puts_P(PSTR("MMU => MK3 'start'"));
                 puts_P(PSTR("MK3 => MMU 'S1'"));
 #endif //MMU_DEBUG
+                mmu_last_response = millis(); // Update last response counter
                 uart2_txPayload("S1-");
                 mmu_state = -2;
             } else if (millis() > 30000) { //30sec after reset disable mmu
@@ -188,7 +190,7 @@ void mmu_loop(void)
             if ((tData1 == 'F') && (tData2 == 'S')) {
 #ifdef TMC2130
                 //re-enable extruder motor
-                disable_e0(); // E0 ena pin toggle
+                mmu_enable_e0(); // E0 ena pin toggle
                 printf_P(PSTR("E-axis enabled\n"));
 #endif //TMC2130
                 printf_P(PSTR("MMU => MK3 'waiting for filament @ MK3 Sensor'\n"));
@@ -202,6 +204,7 @@ void mmu_loop(void)
                     mmuFSensorLoading = false;
                     printf_P(PSTR("MMU => MK3 'ok :)'\n"));
                 } else printf_P(PSTR("MMU => MK3 'ok'\n"));
+                mmu_last_response = millis(); // Update last response counter
                 mmu_ready = true;
                 mmu_state = 1;
             }
@@ -216,7 +219,7 @@ void mmu_loop(void)
             if (lastLoadedFilament != filament) {
 #ifdef TMC2130
                 //disable extruder motor
-                disable_e0(); // E0 ena pin toggle
+                mmu_disable_e0();
                 printf_P(PSTR("E-axis disabled\n"));
 #endif //TMC2130
                 toolChanges++;
@@ -256,7 +259,7 @@ void mmu_loop(void)
             lastLoadedFilament = -10;
 #ifdef TMC2130
             //disable extruder motor
-            disable_e0(); // E0 ena pin toggle
+            mmu_disable_e0();
             printf_P(PSTR("E-axis disabled\n"));
 #endif //TMC2130
             printf_P(PSTR("MK3 => MMU 'E%d'\n"), filament);
@@ -280,7 +283,7 @@ void mmu_loop(void)
         //request every 500ms
         uart2_txPayload("P0-");
         mmu_state = 2;
-    } else if (((mmu_last_response + 500) < millis()) && mmuFSensorLoading && (mmu_state == 1)) {
+    } else if (((mmu_last_response + 4000) < millis()) && mmuFSensorLoading && (mmu_state == 1)) {
         if (!fsensor_enabled) fsensor_enable();
     } // end of if mmu_cmd
 }
@@ -353,7 +356,7 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
                 }
 #ifdef TMC2130
                 //disable extruder motor
-                disable_e0(); // E0 ena pin toggle
+                mmu_disable_e0();
                 printf_P(PSTR("E-axis disabled\n"));
 #endif //TMC2130
                 st_synchronize();
@@ -454,7 +457,7 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
     if (lcd_update_was_enabled) lcd_update_enable(true);
 #ifdef TMC2130
     //enable extruder motor (disabled in mmu_command, start of T-code processing)
-    disable_e0(); // E0 ena pin toggle
+    mmu_enable_e0();
     printf_P(PSTR("E-axis enabled\n"));
 #endif //TMC2130
 }
@@ -1065,6 +1068,8 @@ void lcd_mmu_load_to_nozzle(uint8_t filament_nr)
 {
     if (degHotend0() > EXTRUDE_MINTEMP)
     {
+        filament_ramming();
+        extr_unload();
         tmp_extruder = filament_nr;
         lcd_update_enable(false);
         lcd_clear();
