@@ -73,6 +73,7 @@ void uart2_txPayload(unsigned char payload[3])
 #ifdef MMU_DEBUG
     printf_P(PSTR("\nUART2 TX 0x%2X %2X %2X\n"), payload[0], payload[1], payload[2]);
 #endif //MMU_DEBUG
+    mmu_last_request = millis();
     for (int i = 0; i < 3; i++) lastTxPayload[i] = payload[i];  // Backup incase resend on NACK
     uint16_t csum = 0;
     loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
