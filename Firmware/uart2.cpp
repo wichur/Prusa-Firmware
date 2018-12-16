@@ -26,7 +26,7 @@ void uart2_init(void)
 
 ISR(USART2_RX_vect)
 {
-    cli();
+    //cli();
     readRxBuffer = UDR2;
 #ifdef MMU_DEBUG
     printf_P(PSTR("\nUART2 RX 0x%2X\n"), (0xFF & readRxBuffer));
@@ -65,7 +65,7 @@ ISR(USART2_RX_vect)
         }
     } else if (readRxBuffer == 0x06) pendingACK = false;  // ACK Received Clear pending flag
     else   if (readRxBuffer == 0x15) txRESEND = true;     // Resend last message
-    sei();
+    //sei();
 }
 
 void uart2_txPayload(unsigned char payload[3])

@@ -7,16 +7,19 @@ extern bool mmu_enabled;
 extern bool mmuFSensorLoading;
 extern bool mmuIdleFilamentTesting;
 extern int8_t mmu_state;
+extern uint32_t mmu_last_request;
+
+extern bool mmu_enabled;
 
 extern uint8_t mmu_extruder;
 
 extern uint8_t tmp_extruder;
 
-extern bool mmu_finda;
+extern int8_t mmu_finda;
 
 extern int16_t mmu_version;
 extern int16_t mmu_buildnr;
-extern uint32_t mmu_last_request;
+
 
 #define MMU_CMD_NONE 0
 #define MMU_CMD_T0   0x10
@@ -37,12 +40,13 @@ extern uint32_t mmu_last_request;
 #define MMU_CMD_E3   0x53
 #define MMU_CMD_E4   0x54
 #define MMU_CMD_R0   0x60
-#define MMU_CMD_P0   0x70
 #define MMU_CMD_FS   0x81
+
 
 extern void mmu_init(void);
 
 extern void mmu_loop(void);
+
 
 extern void mmu_reset(void);
 
@@ -65,7 +69,6 @@ extern int get_ext_nr();
 extern void display_loading();
 extern void extr_adj(int extruder);
 extern void extr_unload();
-extern void extr_unload_at_boot();
 extern void extr_adj_0();
 extern void extr_adj_1();
 extern void extr_adj_2();
