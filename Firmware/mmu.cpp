@@ -23,7 +23,6 @@
 #define MMU_TODELAY 100
 #define MMU_TIMEOUT 10
 #define MMU_CMD_TIMEOUT 300000ul //5min timeout for mmu commands (except P0)
-#define MMU_P0_TIMEOUT 3000ul //timeout for P0 command: 3seconds
 
 #ifdef MMU_HWRESET
 #define MMU_RST_PIN 76
@@ -40,6 +39,7 @@ int lastLoadedFilament = -10;
 int toolChanges = 0;
 uint8_t mmuE0BackupCurrents[2] = {0, 0};
 void shutdownE0(bool shutdown = true);
+#define TXTimeout   60           //6ms
 
 static int8_t mmu_state = 0;
 
@@ -94,18 +94,21 @@ void mmu_loop(void)
 #ifdef MMU_DEBUG
   printf_P(PSTR("MMU loop, state=%d\n"), mmu_state);
 #endif //MMU_DEBUG
+  cli();
   unsigned char tData1 = rxData1;                  // Copy volitale vars as local
   unsigned char tData2 = rxData2;
   unsigned char tData3 = rxData3;
   int16_t  tCSUM = ((rxCSUM1 << 8) | rxCSUM2);
   bool     confPayload = confirmedPayload;
-  if (txRESEND) {
+  if ((txRESEND) || (pendingACK && ((startTXTimeout + TXTimeout) < millis()))) {
     txRESEND         = false;
     confirmedPayload = false;
     startRxFlag      = false;
+    sei();
     uart2_txPayload(lastTxPayload);
     return;
   }
+  sei();
 #ifdef MMU_DEBUG
   if (confPayload) printf_P(PSTR("MMU Pre-Conf Payload,0x%2X %2X %2X %2X%2X\n"), tData1, tData2, tData3, (tCSUM >> 8), tCSUM);
 #endif //MMU_DEBUG
@@ -115,8 +118,12 @@ void mmu_loop(void)
     puts_P(PSTR("Non-Conf Payload"));
 #endif //MMU_DEBUG
   } else if (confPayload) {
+#ifdef MMU_DEBUG
+    printf_P(PSTR("MMU Conf Payload,0x%2X %2X %2X %2X%2X\n"), tData1, tData2, tData3, (tCSUM >> 8), tCSUM);
+#endif //MMU_DEBUG
     uart2_txACK();      // Send  ACK Byte
-  
+
+
     if (mmu_state == -1) {
       if ((tData1 == 'S') && (tData2 == 'T') && (tData3 == 'R')) {
 #ifdef MMU_DEBUG
@@ -161,10 +168,10 @@ void mmu_loop(void)
       }
       
     } else if (mmu_state == -4) {
-      if ((tData1 == 'O') && (tData2 == 'K')) {
+      if ((tData1 == 'P') && (tData2 == 'K')) {
         mmu_finda = tData3;
 #ifdef MMU_DEBUG
-        printf_P(PSTR("MMU => MK3 'ok%d'\n"), mmu_finda);
+        printf_P(PSTR("MMU => MK3 'PK%d'\n"), mmu_finda);
 #endif //MMU_DEBUG
         puts_P(PSTR("MMU - ENABLED"));
         fsensor_enable();
@@ -182,10 +189,10 @@ void mmu_loop(void)
       }
       
     } else if (mmu_state == 2) {
-      if ((tData1 == 'O') && (tData2 == 'K')) {
+      if ((tData1 == 'P') && (tData2 == 'K')) {
         mmu_finda = tData3;
 #ifdef MMU_DEBUG
-        printf_P(PSTR("MMU => MK3 'ok%d'\n"), mmu_finda);
+        printf_P(PSTR("MMU => MK3 'PK%d'\n"), mmu_finda);
 #endif //MMU_DEBUG
         if (!mmu_finda && CHECK_FINDA && fsensor_enabled) {
 #ifdef OCTO_NOTIFICATIONS_ON
@@ -196,8 +203,10 @@ void mmu_loop(void)
           if (lcd_autoDepleteEnabled()) enquecommand_front_P(PSTR("M600 AUTO")); //save print and run M600 command
           else enquecommand_front_P(PSTR("M600")); //save print and run M600 command
         }
+        mmu_last_response = millis(); // Update last response counter
         mmu_state = 1;
-      }
+      } else if (((mmu_last_response + 3) < millis()) && !mmuFSensorLoading)
+        mmu_state = 1;
       
     } else if (mmu_state == 3) {
       if ((tData1 == 'F') && (tData2 == 'S')) {
@@ -205,7 +214,7 @@ void mmu_loop(void)
         if (!fsensor_enabled) fsensor_enable();
         fsensor_autoload_enabled = true;
         fsensor_autoload_check_stop();
-        mmu_last_response = millis();
+        mmu_last_response = millis(); // Update last response counter
         mmuFSensorLoading = true;
         mmu_state = 1;
       } else if ((tData1 == 'O') && (tData2 == 'K')) {
@@ -227,7 +236,6 @@ void mmu_loop(void)
         mmuIdleFilamentTesting = false;
         unsigned char tempTxCMD[3] = {'T', filament, BLK};
         toolChanges++;
-        shutdownE0();  // Drop E0 Currents to 0.
         printf_P(PSTR("MK3 => MMU 'T%d @toolChange:%d'\n"), filament, toolChanges);
         uart2_txPayload(tempTxCMD);
         mmu_state = 3; // wait for response
@@ -257,7 +265,6 @@ void mmu_loop(void)
       } else if ((mmu_cmd >= MMU_CMD_E0) && (mmu_cmd <= MMU_CMD_E4))
       {
         filament = mmu_cmd - MMU_CMD_E0;
-        shutdownE0();  // Drop E0 Currents to 0.
         printf_P(PSTR("MK3 => MMU 'E%d'\n"), filament);
         unsigned char tempExCMD[3] = {'E', filament, BLK};
         uart2_txPayload(tempExCMD);
@@ -265,7 +272,6 @@ void mmu_loop(void)
         
       } else if (mmu_cmd == MMU_CMD_R0)
       {
-        shutdownE0(false);  // Reset E0 Currents.
         printf_P(PSTR("MK3 => MMU 'R0'\n"));
         uart2_txPayload("R0-");
         mmu_state = 3; // wait for response
@@ -273,7 +279,6 @@ void mmu_loop(void)
       } else if (mmu_cmd == MMU_CMD_FS)
       {
         printf_P(PSTR("MK3 => MMU 'Filament seen at extruder'\n"));
-        shutdownE0(false);  // Reset E0 Currents.
         uart2_txPayload("FS-");
         fsensor_autoload_enabled = false;
         mmu_state = 3; // wait for response
@@ -296,7 +301,7 @@ void mmu_reset(void)
 	_delay_us(100);
 	digitalWrite(MMU_RST_PIN, HIGH);
 #else                                          //SW - send X0 command
-    mmu_puts_P(PSTR("X0\n"));
+    uart2_txPayload("X0-");
 #endif
 }
 
@@ -309,6 +314,9 @@ int8_t mmu_set_filament_type(uint8_t extruder, uint8_t filament)
 
 void mmu_command(uint8_t cmd)
 {
+  if (((cmd >= MMU_CMD_T0) && (cmd <= MMU_CMD_T4)) || ((cmd >= MMU_CMD_E0) && (cmd <= MMU_CMD_E4))) {
+      shutdownE0();
+  }
 	mmu_cmd = cmd;
 	mmu_ready = false;
 }
@@ -324,7 +332,12 @@ bool mmu_get_response(void)
 	}
 	while (!mmu_ready)
 	{
-//		mmu_loop();
+    if ((txRESEND) || (pendingACK && ((startTXTimeout + TXTimeout) < millis()))) {
+      txRESEND         = false;
+      confirmedPayload = false;
+      startRxFlag      = false;
+      uart2_txPayload(lastTxPayload);
+    }
     if (((mmu_state == 3) || (mmu_state == 10) || mmuFSensorLoading) && ((mmu_last_request + MMU_CMD_TIMEOUT) > millis())) {
       delay_keep_alive(100);
     } else {
@@ -512,9 +525,11 @@ void shutdownE0(bool shutdown)
       mmuE0BackupCurrents[1] = tmc2130_current_r[E_AXIS];
       tmc2130_set_current_h(E_AXIS, 0);
       tmc2130_set_current_r(E_AXIS, 0);
+      printf_P(PSTR("E-AXIS Disabled.\n"));
   } else if (!shutdown && ((tmc2130_current_h[E_AXIS] == 0) && (tmc2130_current_r[E_AXIS] == 0))) {
       tmc2130_set_current_h(E_AXIS, mmuE0BackupCurrents[0]);
       tmc2130_set_current_r(E_AXIS, mmuE0BackupCurrents[1]);
+      printf_P(PSTR("E-AXIS Enabled.\n"));
   }
 }
 

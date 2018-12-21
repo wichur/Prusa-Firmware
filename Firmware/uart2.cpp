@@ -6,8 +6,9 @@ volatile unsigned char readRxBuffer, rxData1 = 0, rxData2 = 0, rxData3 = 0,
 volatile bool startRxFlag = false, confirmedPayload = false, txNAKNext = false,
               txACKNext = false, txRESEND = false, pendingACK = false;
 volatile uint8_t rxCount;
+long startTXTimeout;
 
-byte lastTxPayload[3] = {0, 0, 0};
+unsigned char lastTxPayload[3] = {0, 0, 0};
 
 void uart2_init(void)
 {
@@ -26,15 +27,14 @@ void uart2_init(void)
 
 ISR(USART2_RX_vect)
 {
-    //cli();
+    cli();
     readRxBuffer = UDR2;
-#ifdef MMU_DEBUG
-    printf_P(PSTR("\nUART2 RX 0x%2X\n"), (0xFF & readRxBuffer));
-#endif //MMU_DEBUG
     if ((readRxBuffer == 0x7F) && (!startRxFlag)) {// check for start of framing bytes
         startRxFlag = true;
         rxCount = 0;
-    } else if (startRxFlag == true) {
+    } else if (readRxBuffer == 0x06) pendingACK = false;  // ACK Received Clear pending flag
+    else   if (readRxBuffer == 0x15) txRESEND = true;     // Resend last message
+    else   if ( startRxFlag == true) {
         if (rxCount > 0) {
             if (rxCount > 1) {
                 if (rxCount > 2) {
@@ -63,9 +63,8 @@ ISR(USART2_RX_vect)
             rxData1 = readRxBuffer;
             ++rxCount;
         }
-    } else if (readRxBuffer == 0x06) pendingACK = false;  // ACK Received Clear pending flag
-    else   if (readRxBuffer == 0x15) txRESEND = true;     // Resend last message
-    //sei();
+    }
+    sei();
 }
 
 void uart2_txPayload(unsigned char payload[3])
@@ -76,20 +75,21 @@ void uart2_txPayload(unsigned char payload[3])
     mmu_last_request = millis();
     for (int i = 0; i < 3; i++) lastTxPayload[i] = payload[i];  // Backup incase resend on NACK
     uint16_t csum = 0;
-    loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
-    UDR2 = 0x7F;                            // Start byte 0x7F
-    for (int i = 0; i < 3; i++) {           // Send data
+    loop_until_bit_is_set(UCSR2A, UDRE2);     // Do nothing until UDR is ready for more data to be written to it
+    if (!txRESEND) UDR2 = 0x7F;                              // Start byte 0x7F
+    for (int i = 0; i < 3; i++) {             // Send data
         loop_until_bit_is_set(UCSR2A, UDRE2); // Do nothing until UDR is ready for more data to be written to it
-        UDR2 = payload[i];
+        if (!txRESEND) UDR2 = payload[i];
         csum += payload[i];
     }
-    loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
-    UDR2 = ((0xFFFF & csum) >> 8);
-    loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
-    UDR2 = (0xFF & csum);
-    loop_until_bit_is_set(UCSR2A, UDRE2);   // Do nothing until UDR is ready for more data to be written to it
-    UDR2 = 0xF7;
-    pendingACK = true;                      // Set flag to wait for ACK
+    loop_until_bit_is_set(UCSR2A, UDRE2);     // Do nothing until UDR is ready for more data to be written to it
+    if (!txRESEND) UDR2 = ((0xFFFF & csum) >> 8);
+    loop_until_bit_is_set(UCSR2A, UDRE2);     // Do nothing until UDR is ready for more data to be written to it
+    if (!txRESEND) UDR2 = (0xFF & csum);
+    loop_until_bit_is_set(UCSR2A, UDRE2);     // Do nothing until UDR is ready for more data to be written to it
+    if (!txRESEND) UDR2 = 0xF7;
+    pendingACK = true;                        // Set flag to wait for ACK
+    startTXTimeout = millis();                // Start Tx timeout counter
 }
 
 void uart2_txACK(bool ACK)

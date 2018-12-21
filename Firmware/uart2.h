@@ -2,10 +2,10 @@
 #ifndef _UART2_H
 #define _UART2_H
 
-#define USART2_BAUDRATE  115200UL
+#define USART2_BAUDRATE  38400UL
 #define MMU_F_CPU       16000000UL
 #define BAUD_PRESCALE (((MMU_F_CPU / (USART2_BAUDRATE * 16UL))) - 1)
-#define BLK           (byte)0x2D     // Blank data filler '-'
+#define BLK                0x2D    // Blank data filler "-"
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -17,6 +17,7 @@
 extern volatile unsigned char rxData1, rxData2, rxData3, rxCSUM1, rxCSUM2;
 extern volatile bool startRxFlag, confirmedPayload, txNAKNext, txACKNext,
        txRESEND, pendingACK;
+extern long startTXTimeout;
 
 extern unsigned char lastTxPayload[3];
 
