@@ -39,7 +39,8 @@ int lastLoadedFilament = -10;
 int toolChanges = 0;
 uint8_t mmuE0BackupCurrents[2] = {0, 0};
 void shutdownE0(bool shutdown = true);
-#define TXTimeout   60           //6ms
+#define TXTimeout   60           //60ms
+#define OCTO_NOTIFICATIONS_ON
 
 static int8_t mmu_state = 0;
 
@@ -392,6 +393,9 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
 				  }
 				  st_synchronize();
 				  mmu_print_saved = true;
+#ifdef OCTO_NOTIFICATIONS_ON
+          printf_P(PSTR("// action:mmuAttention\n"));
+#endif // OCTO_NOTIFICATIONS_ON
 				  printf_P(PSTR("MMU not responding\n"));
 				  hotend_temp_bckp = degTargetHotend(active_extruder);
 				  if (move_axes) {
@@ -570,6 +574,13 @@ void mmu_M600_wait_and_beep() {
 
 			delay_keep_alive(4);
 		}
+    setTargetHotend(hotend_temp_bckp, active_extruder);
+    lcd_clear();
+    while ((degTargetHotend(active_extruder) - degHotend(active_extruder)) > 5) 
+    {
+        delay_keep_alive(1000);
+        lcd_wait_for_heater();
+    }
 		WRITE(BEEPER, LOW);
 }
 
@@ -593,13 +604,11 @@ void mmu_M600_load_filament(bool automatic)
 		  lcd_print(tmp_extruder + 1);
 		  snmm_filaments_used |= (1 << tmp_extruder); //for stop print
 
-//		  printf_P(PSTR("T code: %d \n"), tmp_extruder);
-//		  mmu_printf_P(PSTR("T%d\n"), tmp_extruder);
 		  mmu_command(MMU_CMD_T0 + tmp_extruder);
 
 		  manage_response(false, true);
 		  mmu_command(MMU_CMD_C0);
-    	  mmu_extruder = tmp_extruder; //filament change is finished
+    	mmu_extruder = tmp_extruder; //filament change is finished
 		  mmu_load_to_nozzle();
 		  load_filament_final_feed();
 		  st_synchronize();
