@@ -17,11 +17,11 @@
 extern volatile unsigned char rxData1, rxData2, rxData3, rxCSUM1, rxCSUM2;
 extern volatile bool startRxFlag, confirmedPayload, txNAKNext, txACKNext,
        txRESEND, pendingACK;
-extern long startTXTimeout;
+extern unsigned long startTXTimeout;
 
 extern unsigned char lastTxPayload[3];
 
-extern void uart2_txPayload(unsigned char payload[3]);
+extern void uart2_txPayload(unsigned char*);
 extern void uart2_txACK(bool ACK = true);
 
 extern void uart2_init(void);
