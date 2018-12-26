@@ -60,6 +60,8 @@ int16_t mmu_buildnr = -1;
 uint32_t mmu_last_request = 0;
 uint32_t mmu_last_response = 0;
 
+uint8_t mmu_last_cmd = 0;
+
 
 //initialize mmu2 unit - first part - should be done at begining of startup process
 void mmu_init(void)
@@ -136,7 +138,7 @@ void mmu_loop(void)
         puts_P(PSTR("MMU not responding - DISABLED"));
         mmu_state = 0;
       } // End of if STR
-      
+
     } else if (mmu_state == -2) {
       mmu_version = ((tData1 << 8) | (tData2));
       printf_P(PSTR("MMU => MK3 '%d'\n"), mmu_version);
@@ -145,7 +147,7 @@ void mmu_loop(void)
 #endif //MMU_DEBUG
       uart2_txPayload((unsigned char*)0x53322D);  // S2-
       mmu_state = -3;
-      
+
     } else if (mmu_state == -3) {
       mmu_buildnr = ((tData1 << 8) | (tData2));
       printf_P(PSTR("MMU => MK3 '%d'\n"), mmu_buildnr);
@@ -165,7 +167,7 @@ void mmu_loop(void)
         uart2_txPayload((unsigned char*)0x4D312D);  // M1-
         mmu_state = -5;
       }
-      
+
     } else if (mmu_state == -4) {
       if ((tData1 == 'P') && (tData2 == 'K')) {
         mmu_finda = tData3;
@@ -177,7 +179,7 @@ void mmu_loop(void)
         mmu_enabled = true;
         mmu_state = 1;
       }
-      
+
     } else if (mmu_state == -5) {
       if ((tData1 == 'O') && (tData2 == 'K')) {
 #ifdef MMU_DEBUG
@@ -186,7 +188,7 @@ void mmu_loop(void)
         uart2_txPayload((unsigned char*)0x50302D);  // P0-
         mmu_state = -4;
       }
-      
+
     } else if (mmu_state == 2) {
       if ((tData1 == 'P') && (tData2 == 'K')) {
         mmu_finda = tData3;
@@ -206,7 +208,7 @@ void mmu_loop(void)
         mmu_state = 1;
       } else if (((mmu_last_response + 3) < millis()) && !mmuFSensorLoading)
         mmu_state = 1;
-      
+
     } else if (mmu_state == 3) {
       if ((tData1 == 'F') && (tData2 == 'S')) {
         printf_P(PSTR("MMU => MK3 'waiting for filament @ MK3 Sensor'\n"));
@@ -238,7 +240,7 @@ void mmu_loop(void)
         printf_P(PSTR("MK3 => MMU 'T%d @toolChange:%d'\n"), filament, toolChanges);
         uart2_txPayload(tempTxCMD);
         mmu_state = 3; // wait for response
-        
+
       } else if ((mmu_cmd >= MMU_CMD_L0) && (mmu_cmd <= MMU_CMD_L4))
       {
         filament = mmu_cmd - MMU_CMD_L0;
@@ -246,13 +248,13 @@ void mmu_loop(void)
         unsigned char tempLxCMD[3] = {'L', (uint8_t)filament, BLK};
         uart2_txPayload(tempLxCMD);
         mmu_state = 3; // wait for response
-        
+
       } else if (mmu_cmd == MMU_CMD_C0)
       {
         printf_P(PSTR("MK3 => MMU 'C0'\n"));
         uart2_txPayload((unsigned char*)0x43302D);  // C0-
         mmu_state = 3; // wait for response
-        
+
       } else if (mmu_cmd == MMU_CMD_U0)
       {
         printf_P(PSTR("MK3 => MMU 'U0'\n"));
@@ -260,7 +262,7 @@ void mmu_loop(void)
         mmuIdleFilamentTesting = true;
         toolChanges = 0;
         mmu_state = 3; // wait for response
-        
+
       } else if ((mmu_cmd >= MMU_CMD_E0) && (mmu_cmd <= MMU_CMD_E4))
       {
         filament = mmu_cmd - MMU_CMD_E0;
@@ -268,20 +270,20 @@ void mmu_loop(void)
         unsigned char tempExCMD[3] = {'E', (uint8_t)filament, BLK};
         uart2_txPayload(tempExCMD);
         mmu_state = 3; // wait for response
-        
+
       } else if (mmu_cmd == MMU_CMD_R0)
       {
         printf_P(PSTR("MK3 => MMU 'R0'\n"));
         uart2_txPayload((unsigned char*)0x52302D);  // RO-
         mmu_state = 3; // wait for response
-        
+
       } else if (mmu_cmd == MMU_CMD_FS)
       {
         printf_P(PSTR("MK3 => MMU 'Filament seen at extruder'\n"));
         uart2_txPayload((unsigned char*)0x46532D);  // FS-
         fsensor_autoload_enabled = false;
         mmu_state = 3; // wait for response
-        
+
       }
       mmu_cmd = 0;
     }
@@ -377,7 +379,7 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
 	float hotend_temp_bckp = degTargetHotend(active_extruder);
 	float z_position_bckp = current_position[Z_AXIS];
 	float x_position_bckp = current_position[X_AXIS];
-	float y_position_bckp = current_position[Y_AXIS];	
+	float y_position_bckp = current_position[Y_AXIS];
 	uint8_t screen = 0; //used for showing multiscreen messages
 	while(!response)
 	{
@@ -400,13 +402,13 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
 					  z_position_bckp = current_position[Z_AXIS];
 					  x_position_bckp = current_position[X_AXIS];
 					  y_position_bckp = current_position[Y_AXIS];
-				  
+
 					  //lift z
 					  current_position[Z_AXIS] += Z_PAUSE_LIFT;
 					  if (current_position[Z_AXIS] > Z_MAX_POS) current_position[Z_AXIS] = Z_MAX_POS;
 					  plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], 15, active_extruder);
 					  st_synchronize();
-					  					  
+
 					  //Move XY to side
 					  current_position[X_AXIS] = X_PAUSE_POS;
 					  current_position[Y_AXIS] = Y_PAUSE_POS;
@@ -453,7 +455,7 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
 		  }
 		  else if (mmu_print_saved) {
 			  printf_P(PSTR("MMU starts responding\n"));
-			  if (turn_off_nozzle) 
+			  if (turn_off_nozzle)
 			  {
 				lcd_clear();
 				setTargetHotend(hotend_temp_bckp, active_extruder);
@@ -461,12 +463,12 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
 					lcd_display_message_fullscreen_P(_i("MMU OK. Resuming temperature..."));
 					delay_keep_alive(3000);
 				}
-				while ((degTargetHotend(active_extruder) - degHotend(active_extruder)) > 5) 
+				while ((degTargetHotend(active_extruder) - degHotend(active_extruder)) > 5)
 				{
 					delay_keep_alive(1000);
 					lcd_wait_for_heater();
 				}
-			  }			  
+			  }
 			  if (move_axes) {
 				  lcd_clear();
 				  lcd_display_message_fullscreen_P(_i("MMU OK. Resuming position..."));
@@ -498,7 +500,7 @@ void manage_response(bool move_axes, bool turn_off_nozzle)
 void mmu_load_to_nozzle()
 {
 	st_synchronize();
-	
+
 	bool saved_e_relative_mode = axis_relative_modes[E_AXIS];
 	if (!saved_e_relative_mode) axis_relative_modes[E_AXIS] = true;
 	current_position[E_AXIS] += 7.2f;
@@ -566,7 +568,7 @@ void mmu_M600_wait_and_beep() {
 			if (counterBeep == 20) {
 				WRITE(BEEPER, LOW);
 			}
-				
+
 			counterBeep++;
 			#endif //BEEPER > 0
 
@@ -574,7 +576,7 @@ void mmu_M600_wait_and_beep() {
 		}
     setTargetHotend(hotend_temp_bckp, active_extruder);
     lcd_clear();
-    while ((degTargetHotend(active_extruder) - degHotend(active_extruder)) > 5) 
+    while ((degTargetHotend(active_extruder) - degHotend(active_extruder)) > 5)
     {
         delay_keep_alive(1000);
         lcd_wait_for_heater();
@@ -583,7 +585,7 @@ void mmu_M600_wait_and_beep() {
 }
 
 void mmu_M600_load_filament(bool automatic)
-{ 
+{
 	//load filament for mmu v2
 		  tmp_extruder = mmu_extruder;
 		  if (!automatic) {
@@ -646,22 +648,22 @@ void change_extr(int
 	case 1:
 		WRITE(E_MUX0_PIN, HIGH);
 		WRITE(E_MUX1_PIN, LOW);
-		
+
 		break;
 	case 2:
 		WRITE(E_MUX0_PIN, LOW);
 		WRITE(E_MUX1_PIN, HIGH);
-		
+
 		break;
 	case 3:
 		WRITE(E_MUX0_PIN, HIGH);
 		WRITE(E_MUX1_PIN, HIGH);
-		
+
 		break;
 	default:
 		WRITE(E_MUX0_PIN, LOW);
 		WRITE(E_MUX1_PIN, LOW);
-		
+
 		break;
 	}
 	delay(100);
@@ -672,7 +674,7 @@ int get_ext_nr()
 { //reads multiplexer input pins and return current extruder number (counted from 0)
 #ifndef SNMM
 	return(mmu_extruder); //update needed
-#else 
+#else
 	return(2 * READ(E_MUX1_PIN) + READ(E_MUX0_PIN));
 #endif
 }
@@ -680,7 +682,7 @@ int get_ext_nr()
 
 void display_loading()
 {
-	switch (mmu_extruder) 
+	switch (mmu_extruder)
 	{
 	case 1: lcd_display_message_fullscreen_P(_T(MSG_FILAMENT_LOADING_T1)); break;
 	case 2: lcd_display_message_fullscreen_P(_T(MSG_FILAMENT_LOADING_T2)); break;
@@ -699,9 +701,9 @@ void extr_adj(int extruder) //loading filament for SNMM
         return;
     }
     mmu_command(cmd);
-	
+
 	//show which filament is currently loaded
-	
+
 	lcd_update_enable(false);
 	lcd_clear();
 	lcd_set_cursor(0, 1); lcd_puts_P(_T(MSG_LOADING_FILAMENT));
@@ -714,8 +716,8 @@ void extr_adj(int extruder) //loading filament for SNMM
 	manage_response(false, false);
 
 	lcd_update_enable(true);
-	
-	
+
+
 	//lcd_return_to_status();
 #else
 
@@ -724,12 +726,12 @@ void extr_adj(int extruder) //loading filament for SNMM
 	//max_feedrate[E_AXIS] = 50;
 	START:
 	lcd_clear();
-	lcd_set_cursor(0, 0); 
+	lcd_set_cursor(0, 0);
 	switch (extruder) {
 	case 1: lcd_display_message_fullscreen_P(_T(MSG_FILAMENT_LOADING_T1)); break;
 	case 2: lcd_display_message_fullscreen_P(_T(MSG_FILAMENT_LOADING_T2)); break;
 	case 3: lcd_display_message_fullscreen_P(_T(MSG_FILAMENT_LOADING_T3)); break;
-	default: lcd_display_message_fullscreen_P(_T(MSG_FILAMENT_LOADING_T0)); break;   
+	default: lcd_display_message_fullscreen_P(_T(MSG_FILAMENT_LOADING_T0)); break;
 	}
 	KEEPALIVE_STATE(PAUSED_FOR_USER);
 	do{
@@ -802,7 +804,7 @@ void extr_unload()
 	{
 #ifndef SNMM
 		st_synchronize();
-		
+
 		//show which filament is currently unloaded
 		lcd_update_enable(false);
 		lcd_clear();
@@ -830,7 +832,7 @@ void extr_unload()
 			current_position[Z_AXIS] += 15; //lifting in Z direction to make space for extrusion
 			plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], 25, active_extruder);
 		}
-		
+
 		current_position[E_AXIS] += 10; //extrusion
 		plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], 10, active_extruder);
 		st_current_set(2, E_MOTOR_HIGH_CURRENT);
@@ -855,7 +857,7 @@ void extr_unload()
 			plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], 600 / 60, active_extruder); //delay*/
 			delay_keep_alive(4700);
 		}
-	
+
 		max_feedrate[E_AXIS] = 80;
 		current_position[E_AXIS] -= (bowden_length[mmu_extruder] + 60 + FIL_LOAD_LENGTH) / 2;
 		plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], 500, active_extruder);
@@ -928,27 +930,27 @@ void extr_adj_4()
 #endif
 }
 
-void mmu_load_to_nozzle_0() 
+void mmu_load_to_nozzle_0()
 {
 	lcd_mmu_load_to_nozzle(0);
 }
 
-void mmu_load_to_nozzle_1() 
+void mmu_load_to_nozzle_1()
 {
 	lcd_mmu_load_to_nozzle(1);
 }
 
-void mmu_load_to_nozzle_2() 
+void mmu_load_to_nozzle_2()
 {
 	lcd_mmu_load_to_nozzle(2);
 }
 
-void mmu_load_to_nozzle_3() 
+void mmu_load_to_nozzle_3()
 {
 	lcd_mmu_load_to_nozzle(3);
 }
 
-void mmu_load_to_nozzle_4() 
+void mmu_load_to_nozzle_4()
 {
 	lcd_mmu_load_to_nozzle(4);
 }
@@ -1120,7 +1122,7 @@ void lcd_mmu_load_to_nozzle(uint8_t filament_nr)
 	custom_message_type = CUSTOM_MSG_TYPE_F_LOAD;
 	lcd_setstatuspgm(_T(MSG_LOADING_FILAMENT));
 	lcd_return_to_status();
-	lcd_update_enable(true);	
+	lcd_update_enable(true);
 	lcd_load_filament_color_check();
 	lcd_setstatuspgm(_T(WELCOME_MSG));
 	custom_message_type = CUSTOM_MSG_TYPE_STATUS;
@@ -1133,7 +1135,7 @@ void lcd_mmu_load_to_nozzle(uint8_t filament_nr)
 
 void mmu_eject_filament(uint8_t filament, bool recover)
 {
-	if (filament < 5) 
+	if (filament < 5)
 	{
 
 		if (degHotend0() > EXTRUDE_MINTEMP)
