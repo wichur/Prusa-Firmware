@@ -180,8 +180,8 @@ bool fsensor_enable(void)
     fsensor_oq_meassure = false;
     fsensor_err_cnt = 0;
     fsensor_dy_old = 0;
-    eeprom_update_byte((uint8_t*)EEPROM_FSENSOR, 0x01);
-    FSensorStateMenu = 1;
+    eeprom_update_byte((uint8_t*)EEPROM_FSENSOR, fsensor_enabled ? 0x01 : 0x00);
+    FSensorStateMenu = fsensor_enabled ? 1 : 0;
 	}
 	return fsensor_enabled;
 }
