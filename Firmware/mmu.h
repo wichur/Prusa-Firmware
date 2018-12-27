@@ -50,7 +50,7 @@ extern void mmu_loop(void);
 
 extern void mmu_reset(void);
 
-extern int8_t mmu_set_filament_type(uint8_t extruder, uint8_t filament);
+extern void mmu_set_filament_type(uint8_t extruder, uint8_t filament);
 
 extern void mmu_command(uint8_t cmd);
 

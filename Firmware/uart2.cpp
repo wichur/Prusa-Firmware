@@ -6,9 +6,10 @@ volatile unsigned char readRxBuffer, rxData1 = 0, rxData2 = 0, rxData3 = 0,
 volatile bool startRxFlag = false, confirmedPayload = false, txNAKNext = false,
               txACKNext = false, txRESEND = false, pendingACK = false;
 volatile uint8_t rxCount;
-long startTXTimeout;
 
-unsigned char lastTxPayload[3] = {0, 0, 0};
+unsigned long startTXTimeout;
+
+unsigned char lastTxPayload[] = {0, 0, 0};
 
 void uart2_init(void)
 {
@@ -67,20 +68,22 @@ ISR(USART2_RX_vect)
     sei();
 }
 
-void uart2_txPayload(unsigned char payload[3])
+void uart2_txPayload(unsigned char payload[])
 {
 #ifdef MMU_DEBUG
     printf_P(PSTR("\nUART2 TX 0x%2X %2X %2X\n"), payload[0], payload[1], payload[2]);
 #endif //MMU_DEBUG
     mmu_last_request = millis();
-    for (int i = 0; i < 3; i++) lastTxPayload[i] = payload[i];  // Backup incase resend on NACK
+
+
+    for (uint8_t i = 0; i < 3; i++) lastTxPayload[i] = payload[i];  // Backup incase resend on NACK
     uint16_t csum = 0;
     loop_until_bit_is_set(UCSR2A, UDRE2);     // Do nothing until UDR is ready for more data to be written to it
     if (!txRESEND) UDR2 = 0x7F;                              // Start byte 0x7F
-    for (int i = 0; i < 3; i++) {             // Send data
+    for (uint8_t i = 0; i < 3; i++) {             // Send data
         loop_until_bit_is_set(UCSR2A, UDRE2); // Do nothing until UDR is ready for more data to be written to it
-        if (!txRESEND) UDR2 = payload[i];
-        csum += payload[i];
+        if (!txRESEND) UDR2 = (0xFF & (int)payload[i]);
+        csum += (0xFF & (int)payload[i]);
     }
     loop_until_bit_is_set(UCSR2A, UDRE2);     // Do nothing until UDR is ready for more data to be written to it
     if (!txRESEND) UDR2 = ((0xFFFF & csum) >> 8);
