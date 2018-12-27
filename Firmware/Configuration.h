@@ -8,7 +8,7 @@
 
 // Firmware version
 #define FW_VERSION "5.0.4-TZB" // Based on PRUSA 3.5.1
-#define FW_COMMIT_NR   2335
+#define FW_COMMIT_NR   2370
 // FW_VERSION_UNKNOWN means this is an unofficial build.
 // The firmware should only be checked into github with this symbol.
 #define FW_DEV_VERSION FW_VERSION_UNKNOWN

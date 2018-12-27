@@ -96,7 +96,6 @@ void mmu_loop(void)
 #ifdef MMU_DEBUG
   printf_P(PSTR("MMU loop, state=%d\n"), mmu_state);
 #endif //MMU_DEBUG
-  cli();
   unsigned char tData1 = rxData1;                  // Copy volitale vars as local
   unsigned char tData2 = rxData2;
   unsigned char tData3 = rxData3;
@@ -106,11 +105,9 @@ void mmu_loop(void)
     txRESEND         = false;
     confirmedPayload = false;
     startRxFlag      = false;
-    sei();
     uart2_txPayload(lastTxPayload);
     return;
   }
-  sei();
 #ifdef MMU_DEBUG
   if (confPayload) printf_P(PSTR("MMU Pre-Conf Payload,0x%2X %2X %2X %2X%2X\n"), tData1, tData2, tData3, (tCSUM >> 8), tCSUM);
 #endif //MMU_DEBUG
