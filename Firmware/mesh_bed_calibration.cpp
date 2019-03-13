@@ -23,6 +23,8 @@ float   world2machine_shift[2];
 #define WEIGHT_FIRST_ROW_Y_HIGH (0.3f)
 #define WEIGHT_FIRST_ROW_Y_LOW  (0.0f)
 
+
+
 // Scaling of the real machine axes against the programmed dimensions in the firmware.
 // The correction is tiny, here around 0.5mm on 250mm length.
 //#define MACHINE_AXIS_SCALE_X ((250.f - 0.5f) / 250.f)
@@ -97,21 +99,8 @@ const float bed_ref_points_4[] PROGMEM = {
 	13.f - BED_ZERO_REF_X, 104.4f - BED_ZERO_REF_Y
 };
 
-const float bed_ref_points[] PROGMEM = {
-    13.f  - BED_ZERO_REF_X,   8.4f - BED_ZERO_REF_Y,
-    115.f - BED_ZERO_REF_X,   8.4f - BED_ZERO_REF_Y,
-    216.f - BED_ZERO_REF_X,   8.4f - BED_ZERO_REF_Y,
-    
-    216.f - BED_ZERO_REF_X, 104.4f - BED_ZERO_REF_Y,
-    115.f - BED_ZERO_REF_X, 104.4f - BED_ZERO_REF_Y,
-    13.f  - BED_ZERO_REF_X, 104.4f - BED_ZERO_REF_Y,
-
-    13.f  - BED_ZERO_REF_X, 202.4f - BED_ZERO_REF_Y,
-    115.f - BED_ZERO_REF_X, 202.4f - BED_ZERO_REF_Y,
-    216.f - BED_ZERO_REF_X, 202.4f - BED_ZERO_REF_Y
-};
-
 #endif //not HEATBED_V2
+
 
 static inline float sqr(float x) { return x * x; }
 
@@ -2412,8 +2401,11 @@ BedSkewOffsetDetectionResultType find_bed_offset_and_skew(int8_t verbosity_level
 					refresh_cmd_timeout();
 					// Go to the measurement point.
 					// Use the coorrected coordinate, which is a result of find_bed_offset_and_skew().
-					current_position[X_AXIS] = pgm_read_float(bed_ref_points + mesh_point * 2);
-					current_position[Y_AXIS] = pgm_read_float(bed_ref_points + mesh_point * 2 + 1);
+					uint8_t ix = mesh_point % MESH_MEAS_NUM_X_POINTS; // from 0 to MESH_NUM_X_POINTS - 1
+					uint8_t iy = mesh_point / MESH_MEAS_NUM_X_POINTS;
+					if (iy & 1) ix = (MESH_MEAS_NUM_X_POINTS - 1) - ix;
+					current_position[X_AXIS] = BED_X(ix, MESH_MEAS_NUM_X_POINTS);
+					current_position[Y_AXIS] = BED_Y(iy, MESH_MEAS_NUM_Y_POINTS);
 					go_to_current(homing_feedrate[X_AXIS] / 60);
 					delay_keep_alive(3000);
 				}
@@ -2820,12 +2812,11 @@ bool sample_mesh_and_store_reference()
         // Print the decrasing ID of the measurement point.
         current_position[Z_AXIS] = MESH_HOME_Z_SEARCH;
         go_to_current(homing_feedrate[Z_AXIS]/60);
-        // Get cords of measuring point
-        int8_t ix = mesh_point % MESH_MEAS_NUM_X_POINTS;
- 		int8_t iy = mesh_point / MESH_MEAS_NUM_X_POINTS;
-        if (iy & 1) ix = (MESH_MEAS_NUM_X_POINTS - 1) - ix; // Zig zag
-        current_position[X_AXIS] = BED_X(ix, MESH_MEAS_NUM_X_POINTS);
- 		current_position[Y_AXIS] = BED_Y(iy, MESH_MEAS_NUM_Y_POINTS);
+		int8_t ix = mesh_point % MESH_MEAS_NUM_X_POINTS;
+		int8_t iy = mesh_point / MESH_MEAS_NUM_X_POINTS;
+		if (iy & 1) ix = (MESH_MEAS_NUM_X_POINTS - 1) - ix; // Zig zag
+		current_position[X_AXIS] = BED_X(ix, MESH_MEAS_NUM_X_POINTS);
+		current_position[Y_AXIS] = BED_Y(iy, MESH_MEAS_NUM_Y_POINTS);
         world2machine_clamp(current_position[X_AXIS], current_position[Y_AXIS]);
         go_to_current(homing_feedrate[X_AXIS]/60);
 #ifdef MESH_BED_CALIBRATION_SHOW_LCD
@@ -2839,6 +2830,8 @@ bool sample_mesh_and_store_reference()
 			kill(_T(MSG_BED_LEVELING_FAILED_POINT_LOW));
 			return false;
 		}
+        // Get cords of measuring point
+       
         mbl.set_z(ix, iy, current_position[Z_AXIS]);
     }
     {
@@ -2940,8 +2933,13 @@ bool scan_bed_induction_points(int8_t verbosity_level)
         go_to_current(homing_feedrate[Z_AXIS]/60);
         // Go to the measurement point.
         // Use the coorrected coordinate, which is a result of find_bed_offset_and_skew().
-        current_position[X_AXIS] = vec_x[0] * pgm_read_float(bed_ref_points+mesh_point*2) + vec_y[0] * pgm_read_float(bed_ref_points+mesh_point*2+1) + cntr[0];
-        current_position[Y_AXIS] = vec_x[1] * pgm_read_float(bed_ref_points+mesh_point*2) + vec_y[1] * pgm_read_float(bed_ref_points+mesh_point*2+1) + cntr[1];
+		uint8_t ix = mesh_point % MESH_MEAS_NUM_X_POINTS; // from 0 to MESH_NUM_X_POINTS - 1
+		uint8_t iy = mesh_point / MESH_MEAS_NUM_X_POINTS;
+		if (iy & 1) ix = (MESH_MEAS_NUM_X_POINTS - 1) - ix;
+		float bedX = BED_X(ix, MESH_MEAS_NUM_X_POINTS);
+		float bedY = BED_Y(iy, MESH_MEAS_NUM_Y_POINTS);
+        current_position[X_AXIS] = vec_x[0] * bedX + vec_y[0] * bedY + cntr[0];
+        current_position[Y_AXIS] = vec_x[1] * bedX + vec_y[1] * bedY + cntr[1];
         // The calibration points are very close to the min Y.
         if (current_position[Y_AXIS] < Y_MIN_POS_FOR_BED_CALIBRATION)
             current_position[Y_AXIS] = Y_MIN_POS_FOR_BED_CALIBRATION;
