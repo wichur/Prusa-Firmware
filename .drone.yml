@@ -1,0 +1,82 @@
+kind: pipeline
+name: default
+
+workspace:
+  path: Prusa-Firmware
+
+steps:
+  - name: printenv
+    image: matrim/cmake-examples:3.5.1
+    commands:
+      - printenv
+    when: 
+      event: push
+  - name: build
+    image: matrim/cmake-examples:3.5.1
+    commands:
+      - sudo apt update -y
+      - sudo apt-get install -y unzip
+      - mkdir out
+      #
+      - bash -x test.sh
+      - cp Firmware/variants/1_75mm_MK3S-EINSy10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK3S-EINSy10a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK3S-EINSy10a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK3-EINSy10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK3-EINSy10a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK3-EINSy10a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK25S-RAMBo13a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK25S-RAMBo13a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK25S-RAMBo13a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK25S-RAMBo10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK25S-RAMBo10a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK25S-RAMBo10a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK25-RAMBo13a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK25-RAMBo13a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK25-RAMBo13a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK25-RAMBo10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK25-RAMBo10a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK25-RAMBo10a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK2-RAMBo13a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK2-RAMBo13a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK2-RAMBo13a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK2-RAMBo10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK2-RAMBo10a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK2-RAMBo10a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK3-BMG-16-EINSy10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK3-BMG-16-EINSy10a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK3-BMG-16-EINSy10a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK3-BMG-32-EINSy10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK3-BMG-32-EINSy10a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK3-BMG-32-EINSy10a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK3S-BMG-16-EINSy10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK3S-BMG-16-EINSy10a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK3S-BMG-16-EINSy10a-E3Dv6full.hex
+      - rm Firmware/Configuration_prusa.h
+      - cp Firmware/variants/1_75mm_MK3S-BMG-32-EINSy10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      - bash -x build.sh || { echo "1_75mm_MK3S-BMG-32-EINSy10a-E3Dv6full variant failed" && false; }
+      - mv lang/firmware.hex out/1_75mm_MK3S-BMG-32-EINSy10a-E3Dv6full.hex
+    when:
+      event: 
+      - push
+      - tag
+  - name: publish
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: github-token
+      prerelease: true      
+      checksum: md5
+      files: out/*.hex
+    when:
+      event: tag
