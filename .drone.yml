@@ -65,14 +65,14 @@ steps:
       - bash -x build.sh || { echo "1_75mm_MK25-BEAR-RAMBo10a-E3Dv6full variant failed" && false; }
       - mv lang/firmware.hex out/1_75mm_MK25-BEAR-RAMBo10a-E3Dv6full.hex
       - rm Firmware/Configuration_prusa.h
-      - cp Firmware/variants/1_75mm_MK2-RAMBo13a-E3Dv6full.h Firmware/Configuration_prusa.h
-      - bash -x build.sh || { echo "1_75mm_MK2-RAMBo13a-E3Dv6full variant failed" && false; }
-      - mv lang/firmware.hex out/1_75mm_MK2-RAMBo13a-E3Dv6full.hex
-      - rm Firmware/Configuration_prusa.h
-      - cp Firmware/variants/1_75mm_MK2-RAMBo10a-E3Dv6full.h Firmware/Configuration_prusa.h
-      - bash -x build.sh || { echo "1_75mm_MK2-RAMBo10a-E3Dv6full variant failed" && false; }
-      - mv lang/firmware.hex out/1_75mm_MK2-RAMBo10a-E3Dv6full.hex
-      - rm Firmware/Configuration_prusa.h
+      #- cp Firmware/variants/1_75mm_MK2-RAMBo13a-E3Dv6full.h Firmware/Configuration_prusa.h
+      #- bash -x build.sh || { echo "1_75mm_MK2-RAMBo13a-E3Dv6full variant failed" && false; }
+      #- mv lang/firmware.hex out/1_75mm_MK2-RAMBo13a-E3Dv6full.hex
+      #- rm Firmware/Configuration_prusa.h
+      #- cp Firmware/variants/1_75mm_MK2-RAMBo10a-E3Dv6full.h Firmware/Configuration_prusa.h
+      #- bash -x build.sh || { echo "1_75mm_MK2-RAMBo10a-E3Dv6full variant failed" && false; }
+      #- mv lang/firmware.hex out/1_75mm_MK2-RAMBo10a-E3Dv6full.hex
+      #- rm Firmware/Configuration_prusa.h
       - cp Firmware/variants/1_75mm_MK3-BMG-16-EINSy10a-E3Dv6full.h Firmware/Configuration_prusa.h
       - bash -x build.sh || { echo "1_75mm_MK3-BMG-16-EINSy10a-E3Dv6full variant failed" && false; }
       - mv lang/firmware.hex out/1_75mm_MK3-BMG-16-EINSy10a-E3Dv6full.hex
