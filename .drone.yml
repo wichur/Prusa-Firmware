@@ -6,18 +6,14 @@ workspace:
 
 steps:
   - name: printenv
-    image: matrim/cmake-examples:3.5.1
+    image: vertigo235/cmake
     commands:
       - printenv
     when: 
       event: push
   - name: build
-    image: matrim/cmake-examples:3.5.1
+    image: vertigo235/cmake
     commands:
-      - sudo apt update -y
-      - sudo apt-get install -y unzip
-      - mkdir out
-      #
       - bash -x test.sh
       - cp Firmware/variants/1_75mm_MK3S-EINSy10a-E3Dv6full.h Firmware/Configuration_prusa.h
       - bash -x build.sh || { echo "1_75mm_MK3S-EINSy10a-E3Dv6full variant failed" && false; }
