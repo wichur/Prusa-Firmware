@@ -15,7 +15,7 @@
 #define DEVELOPER
 
 // Printer name
-#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5"
+#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5 BEAR"
 
 // Electronics
 #define MOTHERBOARD BOARD_RAMBO_MINI_1_3
