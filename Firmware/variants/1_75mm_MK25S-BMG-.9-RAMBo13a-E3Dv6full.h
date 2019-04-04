@@ -15,7 +15,7 @@
 #define DEVELOPER
 
 // Printer name
-#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5S"
+#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5S BMG .9"
 
 // Electronics
 #define MOTHERBOARD BOARD_RAMBO_MINI_1_3
@@ -36,7 +36,7 @@
  *------------------------------------*/
 
 // Steps per unit {X,Y,Z,E}
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200/8,133}
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200/8,830}
 
 // Endstop inverting
 #define X_MIN_ENDSTOP_INVERTING 0 // set to 1 to invert the logic of the endstop.
@@ -211,12 +211,12 @@
 
 // Load filament commands
 #define LOAD_FILAMENT_0 "M83"
-#define LOAD_FILAMENT_1 "G1 E70 F400"
+#define LOAD_FILAMENT_1 "G1 E80 F400"
 #define LOAD_FILAMENT_2 "G1 E40 F100"
 
 // Unload filament commands
 #define UNLOAD_FILAMENT_0 "M83"
-#define UNLOAD_FILAMENT_1 "G1 E-80 F7000"
+#define UNLOAD_FILAMENT_1 "G1 E-95 F2500"
 
 /*------------------------------------
  CHANGE FILAMENT SETTINGS
@@ -229,9 +229,9 @@
 #define FILAMENTCHANGE_YPOS 0
 #define FILAMENTCHANGE_ZADD 2
 #define FILAMENTCHANGE_FIRSTRETRACT -2
-#define FILAMENTCHANGE_FINALRETRACT -80
+#define FILAMENTCHANGE_FINALRETRACT -95
 
-#define FILAMENTCHANGE_FIRSTFEED 70 //E distance in mm for fast filament loading sequence used used in filament change (M600)
+#define FILAMENTCHANGE_FIRSTFEED 95 //E distance in mm for fast filament loading sequence used used in filament change (M600)
 #define FILAMENTCHANGE_FINALFEED 25 //E distance in mm for slow filament loading sequence used used in filament change (M600) and filament load (M701) 
 #define FILAMENTCHANGE_RECFEED 5
 
@@ -239,7 +239,7 @@
 #define FILAMENTCHANGE_EFEED_FIRST 20 // feedrate in mm/s for fast filament loading sequence used in filament change (M600)
 #define FILAMENTCHANGE_EFEED_FINAL 3.3f // feedrate in mm/s for slow filament loading sequence used in filament change (M600) and filament load (M701) 
 //#define FILAMENTCHANGE_RFEED 400
-#define FILAMENTCHANGE_RFEED 7000 / 60
+#define FILAMENTCHANGE_RFEED 2500 / 60
 #define FILAMENTCHANGE_EXFEED 2
 #define FILAMENTCHANGE_ZFEED 15
 
@@ -274,8 +274,8 @@
 // Motor Current settings for RAMBo mini PWM value = MotorCurrentSetting * 255 / range
 #if MOTHERBOARD == BOARD_RAMBO_MINI_1_0 || MOTHERBOARD == BOARD_RAMBO_MINI_1_3
 #define MOTOR_CURRENT_PWM_RANGE 2000
-#define DEFAULT_PWM_MOTOR_CURRENT  {270, 830, 450} // {XY,Z,E}
-#define DEFAULT_PWM_MOTOR_CURRENT_LOUD  {540, 830, 500} // {XY,Z,E}
+#define DEFAULT_PWM_MOTOR_CURRENT  {270, 830, 700} // {XY,Z,E}
+#define DEFAULT_PWM_MOTOR_CURRENT_LOUD  {540, 830, 700} // {XY,Z,E}
 #define Z_SILENT 0
 #define Z_HIGH_POWER 200
 #endif
