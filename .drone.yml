@@ -82,7 +82,7 @@ steps:
   - name: build
     image: vertigo235/cmake
     environment:
-      BUILD_TYPE: RC
+      BUILD_TYPE: GOLD
     commands:
       - chmod +x PF-build.sh
       - chmod +x lang/config.sh
