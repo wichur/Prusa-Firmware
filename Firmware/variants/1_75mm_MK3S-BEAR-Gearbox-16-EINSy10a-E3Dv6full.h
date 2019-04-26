@@ -15,7 +15,7 @@
 #define DEVELOPER
 
 // Printer name
-#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BEAR GB16"
+#define CUSTOM_MENDEL_NAME "Bear MK3S GB16"
 
 // Electronics
 #define MOTHERBOARD BOARD_EINSY_1_0a
