@@ -46,7 +46,6 @@ steps:
       - git apply Firmware/variants/mmu2s-more-load-4mm.patch
       - bash -x PF-build.sh 1_75mm_MK3S-BEAR-Gearbox-16-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK3S-BEAR-Gearbox-8-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
-      - git reset --hard
     when:
       event:
        - push
