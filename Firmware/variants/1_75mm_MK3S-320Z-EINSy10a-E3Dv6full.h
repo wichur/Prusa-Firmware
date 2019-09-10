@@ -69,7 +69,7 @@
 #define X_MIN_POS 0
 #define Y_MAX_POS 212.5
 #define Y_MIN_POS -4 //orig -4
-#define Z_MAX_POS 210
+#define Z_MAX_POS 310
 #define Z_MIN_POS 0.15
 
 // Uncomment Z_MAX_POS_XYZ_CALIBRATION_CORRECTION define for using the MK3S and MK2.5S firmware 
@@ -434,7 +434,7 @@
 #define BED_ADJUSTMENT_UM_MAX 100
 
 #define MESH_HOME_Z_CALIB 0.2
-#define MESH_HOME_Z_SEARCH 5.0f           // Z lift for homing, mesh bed leveling etc.
+#define MESH_HOME_Z_SEARCH 5 //Z lift for homing, mesh bed leveling etc.
 
 #define X_PROBE_OFFSET_FROM_EXTRUDER 23     // Z probe to nozzle X offset: -left  +right
 #define Y_PROBE_OFFSET_FROM_EXTRUDER 5     // Z probe to nozzle Y offset: -front +behind

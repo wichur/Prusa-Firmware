@@ -19,7 +19,7 @@
 #define DEVELOPER
 
 // Printer name
-#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S"
+#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BEAR"
 
 // Electronics
 #define MOTHERBOARD BOARD_EINSY_1_0a
@@ -27,7 +27,7 @@
 #define HAS_SECOND_SERIAL_PORT
 
 // PSU
-#define PSU_Delta                                 // uncomment if DeltaElectronics PSU installed
+//#define PSU_Delta // uncomment if DeltaElectronics PSU installed
 
 
 // Uncomment the below for the E3D PT100 temperature sensor (with or without PT100 Amplifier)
@@ -80,7 +80,7 @@
 //
 //                                                The correct value for a MK3S extruder is 9.0, for all other printers choose 2.0.
 // This is only relevant for "S" firmware and an extruder like the Bondtech BMG or Bear extruders.
-#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 9.0 // This represents the correction as needed for MK3S extruder 
+#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 2.0 // This represents the correction as needed for MK3S extruder 
 
 // Canceled home position
 #define X_CANCEL_POS 50
@@ -434,7 +434,7 @@
 #define BED_ADJUSTMENT_UM_MAX 100
 
 #define MESH_HOME_Z_CALIB 0.2
-#define MESH_HOME_Z_SEARCH 5.0f           // Z lift for homing, mesh bed leveling etc.
+#define MESH_HOME_Z_SEARCH 5 //Z lift for homing, mesh bed leveling etc.
 
 #define X_PROBE_OFFSET_FROM_EXTRUDER 23     // Z probe to nozzle X offset: -left  +right
 #define Y_PROBE_OFFSET_FROM_EXTRUDER 5     // Z probe to nozzle Y offset: -front +behind
