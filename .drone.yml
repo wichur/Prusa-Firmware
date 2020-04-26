@@ -65,6 +65,10 @@ steps:
       - bash -x PF-build.sh 1_75mm_MK25-BEAR-RAMBo10a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK25-Bondtech-16-RAMBo13a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK25-Bondtech-16-RAMBo10a-E3Dv6full.h ALL $BUILD_TYPE
+      ## Make without LA 1.0 Compatibility Mode
+      - sed -i -e 's/\\/\\/#define LA_NOCOMPAT/#define LA_NOCOMPAT/' Firmware/Configuration_adv.h
+      - cp $DRONE_WORKSPACE_BASE/Prusa-Firmware/Firmware/variants/1_75mm_MK3S-BEAR-SilverPSU-EINSy10a-E3Dv6full.h $DRONE_WORKSPACE_BASE/Prusa-Firmware/Firmware/variants/1_75mm_MK3S-BEAR-SilverPSU-xLACompat-EINSy10a-E3Dv6full.h
+      - bash -x PF-build.sh 1_75mm_MK3S-BEAR-SilverPSU-xLACompat-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
     when:
       event:
        - push
@@ -76,19 +80,12 @@ steps:
     environment:
         BUILD_TYPE: GOLD
     commands:
-      - pwd
-      - chmod +x PF-build.sh
-      - chmod +x lang/config.sh
-      - chmod +x lang/fw-clean.sh
-      - chmod +x lang/lang-clean.sh
+      - git reset --hard
       - cd $DRONE_WORKSPACE_BASE
-      - pwd
-      - ls
       - wget https://raw.githubusercontent.com/nato2k/Skelestruder_Firmware_Patch/master/skele_patch.py
       - python skele_patch.py 490 16
       - cp ./Prusa-Firmware/Firmware/variants/1_75mm_MK3-EINSy10a-E3Dv6full.h ./Prusa-Firmware/Firmware/variants/1_75mm_MK3-Skelestruder-16-EINSy10a-E3Dv6full.h
       - cd $DRONE_WORKSPACE
-      - pwd
       - bash -x PF-build.sh 1_75mm_MK3-Skelestruder-16-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
     when:
       event:
