@@ -42,6 +42,7 @@ steps:
       - bash -x PF-build.sh 1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK3S-Bondtech-16-SliceHT-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK3S-Bondtech-16-SilverPSU-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
+      - bash -x PF-build.sh 1_75mm_MK3S-Bondtech-16-SliceHT-SilverPSU-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK3S-320Z-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK3S-Bondtech-320Z-16-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK3S-BEAR-320Z-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
