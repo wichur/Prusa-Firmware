@@ -151,17 +151,6 @@ VARIANT="1_75mm_MK3S-BEAR-320Z-EINSy10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define Z_MAX_POS 210*/#define Z_MAX_POS 310/' ${VARIANT}
 
-##### MK3S Silver PSU Variants
-BASE="1_75mm_MK3S-BEAR-EINSy10a-E3Dv6full.h"
-VARIANT="1_75mm_MK3S-BEAR-SilverPSU-EINSy10a-E3Dv6full.h"
-cp ${BASE} ${VARIANT}
-sed -i -e 's/#define PSU_Delta */\/\/#define PSU_Delta /' ${VARIANT}
-
-BASE="1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h"
-VARIANT="1_75mm_MK3S-Bondtech-16-SilverPSU-EINSy10a-E3Dv6full.h"
-cp ${BASE} ${VARIANT}
-sed -i -e 's/#define PSU_Delta */\/\/#define PSU_Delta /' ${VARIANT}
-
 ##### Slice Thermistor Variants
 ## MK3S
 BASE="1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h"
@@ -187,3 +176,18 @@ VARIANT="1_75mm_MK25S-Bondtech-16-SliceHT-RAMBo10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define MOTHERBOARD BOARD_RAMBO_MINI_1_3*/#define MOTHERBOARD BOARD_RAMBO_MINI_1_0/' ${VARIANT}
 
+##### MK3S Silver PSU Variants
+BASE="1_75mm_MK3S-BEAR-EINSy10a-E3Dv6full.h"
+VARIANT="1_75mm_MK3S-BEAR-SilverPSU-EINSy10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -e 's/#define PSU_Delta */\/\/#define PSU_Delta /' ${VARIANT}
+
+BASE="1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h"
+VARIANT="1_75mm_MK3S-Bondtech-16-SilverPSU-EINSy10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -e 's/#define PSU_Delta */\/\/#define PSU_Delta /' ${VARIANT}
+
+BASE="1_75mm_MK3S-Bondtech-16-SliceHT-EINSy10a-E3Dv6full.h"
+VARIANT="1_75mm_MK3S-Bondtech-16-SliceHT-SilverPSU-EINSy10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -e 's/#define PSU_Delta */\/\/#define PSU_Delta /' ${VARIANT}
