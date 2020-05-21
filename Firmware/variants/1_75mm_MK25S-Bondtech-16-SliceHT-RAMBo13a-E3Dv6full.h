@@ -8,6 +8,7 @@
  *------------------------------------*/
 
 // Printer revision
+#define BONDTECH_MK25S
 #define PRINTER_TYPE PRINTER_MK25S
 #define PRINTER_NAME PRINTER_MK25S_NAME
 #define PRINTER_MMU_TYPE PRINTER_MK25S_MMU2

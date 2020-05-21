@@ -8,7 +8,7 @@
  *------------------------------------*/
 
 // Printer revision
-#define BONDTECH_MK3S
+#define BONDTECH_MOSQUITO
 #define PRINTER_TYPE PRINTER_MK3S
 #define PRINTER_NAME PRINTER_MK3S_NAME
 #define PRINTER_MMU_TYPE PRINTER_MK3S_MMU2
@@ -70,7 +70,7 @@
 #define X_MIN_POS 0
 #define Y_MAX_POS 212.5
 #define Y_MIN_POS -4 //orig -4
-#define Z_MAX_POS 310
+#define Z_MAX_POS 210
 #define Z_MIN_POS 0.15
 
 // Uncomment Z_MAX_POS_XYZ_CALIBRATION_CORRECTION define for using the MK3S and MK2.5S firmware 

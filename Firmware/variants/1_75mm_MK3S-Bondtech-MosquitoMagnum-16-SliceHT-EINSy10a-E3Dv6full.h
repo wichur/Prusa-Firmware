@@ -8,7 +8,7 @@
  *------------------------------------*/
 
 // Printer revision
-#define BONDTECH_MK3S
+#define BONDTECH_MOSQUITO_MAGNUM
 #define PRINTER_TYPE PRINTER_MK3S
 #define PRINTER_NAME PRINTER_MK3S_NAME
 #define PRINTER_MMU_TYPE PRINTER_MK3S_MMU2
@@ -20,7 +20,7 @@
 #define DEVELOPER
 
 // Printer name
-#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BPE"
+#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BPE Slice"
 
 // Electronics
 #define MOTHERBOARD BOARD_EINSY_1_0a
@@ -70,7 +70,7 @@
 #define X_MIN_POS 0
 #define Y_MAX_POS 212.5
 #define Y_MIN_POS -4 //orig -4
-#define Z_MAX_POS 310
+#define Z_MAX_POS 210
 #define Z_MIN_POS 0.15
 
 // Uncomment Z_MAX_POS_XYZ_CALIBRATION_CORRECTION define for using the MK3S and MK2.5S firmware 
@@ -295,7 +295,7 @@
  *------------------------------------*/
 
 // Mintemps
-#define HEATER_0_MINTEMP 10
+#define HEATER_0_MINTEMP 5
 #define HEATER_1_MINTEMP 5
 #define HEATER_2_MINTEMP 5
 #define HEATER_MINTEMP_DELAY 15000                // [ms] ! if changed, check maximal allowed value @ ShortTimer
@@ -312,7 +312,7 @@
 #if defined(E3D_PT100_EXTRUDER_WITH_AMP) || defined(E3D_PT100_EXTRUDER_NO_AMP)
 #define HEATER_0_MAXTEMP 410
 #else
-#define HEATER_0_MAXTEMP 305
+#define HEATER_0_MAXTEMP 410
 #endif
 #define HEATER_1_MAXTEMP 305
 #define HEATER_2_MAXTEMP 305
@@ -570,7 +570,7 @@
 #elif defined(E3D_PT100_EXTRUDER_NO_AMP)
 #define TEMP_SENSOR_0 148
 #else
-#define TEMP_SENSOR_0 5
+#define TEMP_SENSOR_0 800
 #endif
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
