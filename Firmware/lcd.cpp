@@ -206,11 +206,15 @@ static void lcd_begin(uint8_t clear)
     lcd_send(LCD_FUNCTIONSET | LCD_8BITMODE, LOW | LCD_HALF_FLAG, 510); // 0011xxxx //set to 8BIT mode
     lcd_send(LCD_2LINE << 4, LOW | LCD_HALF_FLAG); // xxxx1000 //set lcd to two line mode (it is used also on 4 line displays) // Comment this out for V1 OLED
 
+#ifndef LCD_8BIT
     lcd_send(LCD_FUNCTIONSET | LCD_4BITMODE, LOW | LCD_HALF_FLAG); // 0010xxxx //set 4BIT mode //last four bits are not important.
     lcd_send(LCD_FUNCTIONSET | LCD_4BITMODE | LCD_2LINE, LOW | LCD_HALF_FLAG); // 0010xxxx //functionset 4 bit
     lcd_send((/*LCD_FUNCTIONSET | LCD_4BITMODE | */LCD_2LINE) << 4, LOW | LCD_HALF_FLAG); // xxxx1000 //two line lcd second nibble
+#endif
 
-    lcd_no_display();
+    //lcd_no_display();
+	lcd_displaycontrol &= ~LCD_DISPLAYON;
+	lcd_command(LCD_DISPLAYCONTROL | lcd_displaycontrol);
     lcd_command(LCD_FUNCTIONSET | lcd_displayfunction); // Set # lines, font size, etc.
     lcd_clear();
     lcd_command(LCD_ENTRYMODESET | lcd_displaymode); // Set Entry Mode
