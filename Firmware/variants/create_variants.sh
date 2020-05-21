@@ -151,6 +151,31 @@ VARIANT="1_75mm_MK3S-BEAR-320Z-EINSy10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define Z_MAX_POS 210*/#define Z_MAX_POS 310/' ${VARIANT}
 
+##### Slice Thermistor Variants
+## MK3S
+BASE="1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h"
+VARIANT="1_75mm_MK3S-Bondtech-16-SliceHT-EINSy10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -E 's/#define CUSTOM_MENDEL_NAME "([A-Za-z0-9\. ]*)"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BPE Slice"/' ${VARIANT}
+sed -i -e 's/#define TEMP_SENSOR_0 5/#define TEMP_SENSOR_0 800/' ${VARIANT}
+sed -i -e 's/#define HEATER_0_MINTEMP [0-9]*/#define HEATER_0_MINTEMP 5/' ${VARIANT}
+sed -i -E 's/#define HEATER_0_MAXTEMP [0-9]*/#define HEATER_0_MAXTEMP 410/' ${VARIANT}
+
+## MK2.5S
+BASE="1_75mm_MK25S-Bondtech-16-RAMBo13a-E3Dv6full.h"
+VARIANT="1_75mm_MK25S-Bondtech-16-SliceHT-RAMBo13a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -E 's/#define CUSTOM_MENDEL_NAME "([A-Za-z0-9\. ]*)"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5S BPE Slice"/' ${VARIANT}
+sed -i -e 's/#define TEMP_SENSOR_0 5/#define TEMP_SENSOR_0 800/' ${VARIANT}
+sed -i -e 's/#define HEATER_0_MINTEMP [0-9]*/#define HEATER_0_MINTEMP 10/' ${VARIANT}
+sed -i -E 's/#define HEATER_0_MAXTEMP [0-9]*/#define HEATER_0_MAXTEMP 410/' ${VARIANT}
+
+# RAMBo10a
+BASE="1_75mm_MK25S-Bondtech-16-SliceHT-RAMBo13a-E3Dv6full.h"
+VARIANT="1_75mm_MK25S-Bondtech-16-SliceHT-RAMBo10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -e 's/#define MOTHERBOARD BOARD_RAMBO_MINI_1_3*/#define MOTHERBOARD BOARD_RAMBO_MINI_1_0/' ${VARIANT}
+
 ##### MK3S Silver PSU Variants
 BASE="1_75mm_MK3S-BEAR-EINSy10a-E3Dv6full.h"
 VARIANT="1_75mm_MK3S-BEAR-SilverPSU-EINSy10a-E3Dv6full.h"
@@ -162,3 +187,7 @@ VARIANT="1_75mm_MK3S-Bondtech-16-SilverPSU-EINSy10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define PSU_Delta */\/\/#define PSU_Delta /' ${VARIANT}
 
+BASE="1_75mm_MK3S-Bondtech-16-SliceHT-EINSy10a-E3Dv6full.h"
+VARIANT="1_75mm_MK3S-Bondtech-16-SliceHT-SilverPSU-EINSy10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -e 's/#define PSU_Delta */\/\/#define PSU_Delta /' ${VARIANT}
