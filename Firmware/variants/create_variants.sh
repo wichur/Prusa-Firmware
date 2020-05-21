@@ -21,6 +21,7 @@ sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3"*/#define CUSTOM_MENDEL_NA
 VARIANT="1_75mm_MK3-Bondtech-16-EINSy10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3 BPE"/' ${VARIANT}
+sed -i -e 's/\/\/ Printer revision*/\/\/ Printer revision\n#define BONDTECH_MK3/' ${VARIANT}
 # E Steps 
 sed -i -e 's/#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200\/8,280}*/#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200\/8,415}/' ${VARIANT}
 # Microsteps
@@ -44,6 +45,7 @@ sed -i -e 's/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 9.0*/#define Z_MAX_POS
 VARIANT="1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BPE"/' ${VARIANT}
+sed -i -e 's/\/\/ Printer revision*/\/\/ Printer revision\n#define BONDTECH_MK3S/' ${VARIANT}
 sed -i -e 's/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 9.0*/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 2.0/' ${VARIANT}
 # E Steps 
 sed -i -e 's/#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200\/8,280}*/#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200\/8,415}/' ${VARIANT}
@@ -68,6 +70,7 @@ sed -i -e 's/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 9.0*/#define Z_MAX_POS
 VARIANT="1_75mm_MK25S-Bondtech-16-RAMBo13a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5S"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5S BPE"/' ${VARIANT}
+sed -i -e 's/\/\/ Printer revision*/\/\/ Printer revision\n#define BONDTECH_MK25S/' ${VARIANT}
 sed -i -e 's/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 9.0*/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 2.0/' ${VARIANT}
 # E Steps 
 sed -i -e 's/#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200\/8,133}*/#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200\/8,415}/' ${VARIANT}
@@ -102,6 +105,7 @@ sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5"*/#define CUSTOM_MENDEL_
 VARIANT="1_75mm_MK25-Bondtech-16-RAMBo13a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5 BPE"/' ${VARIANT}
+sed -i -e 's/\/\/ Printer revision*/\/\/ Printer revision\n#define BONDTECH_MK25/' ${VARIANT}
 # E Steps 
 sed -i -e 's/#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200\/8,133}*/#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,3200\/8,415}/' ${VARIANT}
 # Filament Load Distances (BPE gears are farther from the hotend)
@@ -151,10 +155,41 @@ VARIANT="1_75mm_MK3S-BEAR-320Z-EINSy10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define Z_MAX_POS 210*/#define Z_MAX_POS 310/' ${VARIANT}
 
+##### Bondtech Mosquito
+## MK3S - Mosquito Standard
+BASE="1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h"
+VARIANT="1_75mm_MK3S-Bondtech-Mosquito-16-EINSy10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -e 's/#define BONDTECH_MK3S/#define BONDTECH_MOSQUITO/' ${VARIANT}
+
+## MK3S - Mosquito Magnum
+BASE="1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h"
+VARIANT="1_75mm_MK3S-Bondtech-MosquitoMagnum-16-EINSy10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -e 's/#define BONDTECH_MK3S/#define BONDTECH_MOSQUITO_MAGNUM/' ${VARIANT}
+
 ##### Slice Thermistor Variants
 ## MK3S
 BASE="1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h"
 VARIANT="1_75mm_MK3S-Bondtech-16-SliceHT-EINSy10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -E 's/#define CUSTOM_MENDEL_NAME "([A-Za-z0-9\. ]*)"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BPE Slice"/' ${VARIANT}
+sed -i -e 's/#define TEMP_SENSOR_0 5/#define TEMP_SENSOR_0 800/' ${VARIANT}
+sed -i -e 's/#define HEATER_0_MINTEMP [0-9]*/#define HEATER_0_MINTEMP 5/' ${VARIANT}
+sed -i -E 's/#define HEATER_0_MAXTEMP [0-9]*/#define HEATER_0_MAXTEMP 410/' ${VARIANT}
+
+## MK3S - Mosquito
+BASE="1_75mm_MK3S-Bondtech-Mosquito-16-EINSy10a-E3Dv6full.h"
+VARIANT="1_75mm_MK3S-Bondtech-Mosquito-16-SliceHT-EINSy10a-E3Dv6full.h"
+cp ${BASE} ${VARIANT}
+sed -i -E 's/#define CUSTOM_MENDEL_NAME "([A-Za-z0-9\. ]*)"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BPE Slice"/' ${VARIANT}
+sed -i -e 's/#define TEMP_SENSOR_0 5/#define TEMP_SENSOR_0 800/' ${VARIANT}
+sed -i -e 's/#define HEATER_0_MINTEMP [0-9]*/#define HEATER_0_MINTEMP 5/' ${VARIANT}
+sed -i -E 's/#define HEATER_0_MAXTEMP [0-9]*/#define HEATER_0_MAXTEMP 410/' ${VARIANT}
+
+## MK3S - Mosquito Magnum
+BASE="1_75mm_MK3S-Bondtech-MosquitoMagnum-16-EINSy10a-E3Dv6full.h"
+VARIANT="1_75mm_MK3S-Bondtech-MosquitoMagnum-16-SliceHT-EINSy10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -E 's/#define CUSTOM_MENDEL_NAME "([A-Za-z0-9\. ]*)"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BPE Slice"/' ${VARIANT}
 sed -i -e 's/#define TEMP_SENSOR_0 5/#define TEMP_SENSOR_0 800/' ${VARIANT}
