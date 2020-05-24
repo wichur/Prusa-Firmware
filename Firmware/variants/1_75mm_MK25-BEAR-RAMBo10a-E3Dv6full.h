@@ -21,6 +21,9 @@
 // Printer name
 #define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5 BEAR"
 
+// WEH002004 OLED Display uncomment WEH002004_OLED if have this kind of display
+#define WEH002004_OLED
+
 // Electronics
 #define MOTHERBOARD BOARD_RAMBO_MINI_1_0
 
