@@ -22,7 +22,7 @@
 #define CUSTOM_MENDEL_NAME "Prusa i3 MK3S"
 
 // WEH002004 OLED Display uncomment WEH002004_OLED if have this kind of display
-//#define WEH002004_OLED
+#define WEH002004_OLED
 
 // Electronics
 #define MOTHERBOARD BOARD_EINSY_1_0a
