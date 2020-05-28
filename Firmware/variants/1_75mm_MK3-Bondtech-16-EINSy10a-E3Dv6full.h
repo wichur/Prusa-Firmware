@@ -9,6 +9,7 @@
  *------------------------------------*/
 
 // Printer revision
+#define BONDTECH_MK3
 #define PRINTER_TYPE PRINTER_MK3
 #define PRINTER_NAME PRINTER_MK3_NAME
 #define PRINTER_MMU_TYPE PRINTER_MK3_MMU2
@@ -21,6 +22,9 @@
 
 // Printer name
 #define CUSTOM_MENDEL_NAME "Prusa i3 MK3 BPE"
+
+// WEH002004 OLED Display uncomment WEH002004_OLED if have this kind of display
+#define WEH002004_OLED
 
 // Electronics
 #define MOTHERBOARD BOARD_EINSY_1_0a
