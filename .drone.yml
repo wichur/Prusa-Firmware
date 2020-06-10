@@ -74,6 +74,8 @@ steps:
       - sed -i -e 's/\\/\\/#define LA_NOCOMPAT/#define LA_NOCOMPAT/' Firmware/Configuration_adv.h
       - cp $DRONE_WORKSPACE_BASE/Prusa-Firmware/Firmware/variants/1_75mm_MK3S-BEAR-SilverPSU-EINSy10a-E3Dv6full.h $DRONE_WORKSPACE_BASE/Prusa-Firmware/Firmware/variants/1_75mm_MK3S-BEAR-SilverPSU-xLACompat-EINSy10a-E3Dv6full.h
       - bash -x PF-build.sh 1_75mm_MK3S-BEAR-SilverPSU-xLACompat-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
+      - cp $DRONE_WORKSPACE_BASE/Prusa-Firmware/Firmware/variants/1_75mm_MK3S-BEAR-EINSy10a-E3Dv6full.h $DRONE_WORKSPACE_BASE/Prusa-Firmware/Firmware/variants/1_75mm_MK3S-BEAR-xLACompat-EINSy10a-E3Dv6full.h
+      - bash -x PF-build.sh 1_75mm_MK3S-BEAR-xLACompat-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
     when:
       event:
        - push
