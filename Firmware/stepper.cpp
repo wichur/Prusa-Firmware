@@ -915,6 +915,13 @@ FORCE_INLINE void isr() {
 
       current_block = NULL;
       plan_discard_current_block();
+
+#ifdef LIN_ADVANCE
+      // This is the last time the main isr is called for this block, meaning
+      // we should now always flush ALL accumulated e_steps during the advance_isr
+      // irregardless of the decompression phase and main stepping frequency
+      LA_phase = -1;
+#endif
     }
 #if !defined(LIN_ADVANCE) && defined(FILAMENT_SENSOR)
 	else if ((abs(fsensor_counter) >= fsensor_chunk_len))
