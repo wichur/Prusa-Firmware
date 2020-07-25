@@ -86,6 +86,7 @@ steps:
         BUILD_TYPE: GOLD
     commands:
       - git reset --hard
+      - sed -i -e 's/#define FW_COMMIT_NR[ ]*[0-9]*/#define FW_COMMIT_NR '"$DRONE_BUILD_STARTED"'/' Firmware/Configuration.h
       - cd $DRONE_WORKSPACE_BASE
       - wget https://raw.githubusercontent.com/nato2k/Skelestruder_Firmware_Patch/master/skele_patch.py
       - python skele_patch.py 490 16
