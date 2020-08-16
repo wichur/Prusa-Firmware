@@ -290,6 +290,9 @@ void calculate_trapezoid_for_block(block_t *block, float entry_speed, float exit
 #endif
   }
 
+  max_adv_steps *= 2;
+  final_adv_steps *= 2;
+
   CRITICAL_SECTION_START;  // Fill variables used by the stepper in a critical section
   // This block locks the interrupts globally for 4.38 us,
   // which corresponds to a maximum repeat frequency of 228.57 kHz.
@@ -866,8 +869,8 @@ void plan_buffer_line(float x, float y, float z, const float &e, float feed_rate
   // Number of steps for each axis
 #ifndef COREXY
 // default non-h-bot planning
-block->steps_x.wide = labs(target[X_AXIS]-position[X_AXIS]);
-block->steps_y.wide = labs(target[Y_AXIS]-position[Y_AXIS]);
+block->steps_x.wide = labs(target[X_AXIS]-position[X_AXIS])*2;
+block->steps_y.wide = labs(target[Y_AXIS]-position[Y_AXIS])*2;
 #else
 // corexy planning
 // these equations follow the form of the dA and dB equations on http://www.corexy.com/theory.html
@@ -875,7 +878,7 @@ block->steps_x.wide = labs((target[X_AXIS]-position[X_AXIS]) + (target[Y_AXIS]-p
 block->steps_y.wide = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-position[Y_AXIS]));
 #endif
   block->steps_z.wide = labs(target[Z_AXIS]-position[Z_AXIS]);
-  block->steps_e.wide = labs(target[E_AXIS]-position[E_AXIS]);
+  block->steps_e.wide = labs(target[E_AXIS]-position[E_AXIS])*2;
   block->step_event_count.wide = max(block->steps_x.wide, max(block->steps_y.wide, max(block->steps_z.wide, block->steps_e.wide)));
 
   // Bail if this is a zero-length block
@@ -1131,12 +1134,12 @@ Having the real displacement of the head, we can calculate the total movement le
 
     // Limit acceleration per axis
     //FIXME Vojtech: One shall rather limit a projection of the acceleration vector instead of using the limit.
-    if(((float)block->acceleration_st * (float)block->steps_x.wide / (float)block->step_event_count.wide) > axis_steps_per_sqr_second[X_AXIS])
-	{  block->acceleration_st = axis_steps_per_sqr_second[X_AXIS]; maxlimit_status |= (X_AXIS_MASK << 4); }
-    if(((float)block->acceleration_st * (float)block->steps_y.wide / (float)block->step_event_count.wide) > axis_steps_per_sqr_second[Y_AXIS])
-	{  block->acceleration_st = axis_steps_per_sqr_second[Y_AXIS]; maxlimit_status |= (Y_AXIS_MASK << 4); }
-    if(((float)block->acceleration_st * (float)block->steps_e.wide / (float)block->step_event_count.wide) > axis_steps_per_sqr_second[E_AXIS])
-	{  block->acceleration_st = axis_steps_per_sqr_second[E_AXIS]; maxlimit_status |= (Z_AXIS_MASK << 4); }
+    if(((float)block->acceleration_st * (float)(block->steps_x.wide) / (float)block->step_event_count.wide) > axis_steps_per_sqr_second[X_AXIS]*2)
+	{  block->acceleration_st = axis_steps_per_sqr_second[X_AXIS]*2; maxlimit_status |= (X_AXIS_MASK << 4); }
+    if(((float)block->acceleration_st * (float)(block->steps_y.wide) / (float)block->step_event_count.wide) > axis_steps_per_sqr_second[Y_AXIS]*2)
+	{  block->acceleration_st = axis_steps_per_sqr_second[Y_AXIS]*2; maxlimit_status |= (Y_AXIS_MASK << 4); }
+    if(((float)block->acceleration_st * (float)block->steps_e.wide / (float)block->step_event_count.wide) > axis_steps_per_sqr_second[E_AXIS]*2)
+	{  block->acceleration_st = axis_steps_per_sqr_second[E_AXIS]*2; maxlimit_status |= (Z_AXIS_MASK << 4); }
     if(((float)block->acceleration_st * (float)block->steps_z.wide / (float)block->step_event_count.wide ) > axis_steps_per_sqr_second[Z_AXIS])
 	{  block->acceleration_st = axis_steps_per_sqr_second[Z_AXIS]; maxlimit_status |= (E_AXIS_MASK << 4); }
   }
@@ -1303,7 +1306,7 @@ Having the real displacement of the head, we can calculate the total movement le
       // to save more space we avoid another copy of calc_timer and go through slow division, but we
       // still need to replicate the *exact* same step grouping policy (see below)
       if (advance_speed > MAX_STEP_FREQUENCY) advance_speed = MAX_STEP_FREQUENCY;
-      float advance_rate = (F_CPU / 8.0) / advance_speed;
+      float advance_rate = (F_CPU / 8.0) / advance_speed / 2;
       if (advance_speed > 20000) {
           block->advance_rate = advance_rate * 4;
           block->advance_step_loops = 4;
