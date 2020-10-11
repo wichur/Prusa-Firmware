@@ -35,7 +35,7 @@ steps:
       - chmod +x lang/config.sh
       - chmod +x lang/fw-clean.sh
       - chmod +x lang/lang-clean.sh
-      - sed -i -e 's/#define FW_COMMIT_NR[ ]*[0-9]*/#define FW_COMMIT_NR '"$DRONE_BUILD_STARTED"'/' Firmware/Configuration.h
+      - sed -i -e 's/#define FW_COMMIT_NR[ ]*[0-9]*/#define FW_COMMIT_NR '"$DRONE_BUILD_NUMBER"'/' Firmware/Configuration.h
       - bash -x PF-build.sh 1_75mm_MK3S-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK3S-BEAR-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
       - bash -x PF-build.sh 1_75mm_MK3S-BEAR-SilverPSU-EINSy10a-E3Dv6full.h ALL $BUILD_TYPE
@@ -86,7 +86,7 @@ steps:
         BUILD_TYPE: GOLD
     commands:
       - git reset --hard
-      - sed -i -e 's/#define FW_COMMIT_NR[ ]*[0-9]*/#define FW_COMMIT_NR '"$DRONE_BUILD_STARTED"'/' Firmware/Configuration.h
+      - sed -i -e 's/#define FW_COMMIT_NR[ ]*[0-9]*/#define FW_COMMIT_NR '"$DRONE_BUILD_NUMBER"'/' Firmware/Configuration.h
       - cd $DRONE_WORKSPACE_BASE
       - wget https://raw.githubusercontent.com/nato2k/Skelestruder_Firmware_Patch/master/skele_patch.py
       - python skele_patch.py 490 16
@@ -111,7 +111,7 @@ steps:
       - mv `find -name "*.zip"` $DRONE_WORKSPACE/out
       - mv `find -name "*.hex"` $DRONE_WORKSPACE/out
       - cd $DRONE_WORKSPACE/fileshare
-      - zip -q -j prusa3d_fw_$(git rev-parse --short HEAD).zip $DRONE_WORKSPACE/out/*.*
+      - zip -q -j prusa3d_fw_${DRONE_BUILD_NUMBER}.zip $DRONE_WORKSPACE/out/*.*
 
     when:
       event:
@@ -127,7 +127,7 @@ steps:
     failure: ignore
     commands:
       - cd $DRONE_WORKSPACE/fileshare
-      - curl --upload-file prusa3d_fw_$(git rev-parse --short HEAD).zip https://transfer.sh/prusa3d_fw_$(git rev-parse --short HEAD).zip
+      - curl --upload-file prusa3d_fw_${DRONE_BUILD_NUMBER}.zip https://transfer.sh/prusa3d_fw_${DRONE_BUILD_NUMBER}.zip
       - echo
     when:
       event:
@@ -142,7 +142,7 @@ steps:
     failure: ignore
     commands:
       - cd $DRONE_WORKSPACE/fileshare
-      - curl -F "file=@prusa3d_fw_$(git rev-parse --short HEAD).zip" https://file.io
+      - curl -F "file=@prusa3d_fw_${DRONE_BUILD_NUMBER}.zip" https://file.io
       - echo
     when:
       event:
