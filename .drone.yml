@@ -19,6 +19,9 @@ steps:
     image: vertigo235/fw-build:develop
     commands:
       - cp -R /build-env/ ../PF-build-dl/
+      - cd ../PF-build-dl/
+      - pwd
+      - ls -l
 
   - name: tests
     image: vertigo235/fw-build:develop
