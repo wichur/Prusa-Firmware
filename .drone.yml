@@ -14,7 +14,12 @@ steps:
         - push
         - tag
         - pull_request
-  
+ 
+  - name: copy-build-environment
+    image: vertigo235/fw-build:develop
+    commands:
+      - cp -R /build-env/ ../PF-build-dl/
+
   - name: tests
     image: vertigo235/fw-build:develop
     commands:
@@ -79,6 +84,8 @@ steps:
        - push
        - tag
        - pull_request
+    depends_on:
+       - copy-build-environment
   
   - name: skele-build
     image: vertigo235/fw-build:develop
