@@ -1470,6 +1470,8 @@ static bool can_load()
       current_position[E_AXIS] += 70; //Bondtech_Mosquito 70mm from drive gear to melt zone
     #elif defined(BONDTECH_MOSQUITO_MAGNUM)
       current_position[E_AXIS] += 62; //Bondtech_Mosquito_Magnum 62mm from drive gear to melt zone
+    #elif defined(BEAR_EXTRUDER)
+      current_position[E_AXIS] += 65; //Bear MK3S 65mm from drive gear to melt zone
     #else
       current_position[E_AXIS] += 60;
     #endif
@@ -1483,6 +1485,8 @@ static bool can_load()
       current_position[E_AXIS] -= 62; // Pull back 62mm, 8 mm below drive gear
     #elif defined(BONDTECH_MOSQUITO_MAGNUM)
       current_position[E_AXIS] -= 54; // Pull back 54mm, 8 mm below drive gear
+    #elif defined(BEAR_EXTRUDER)
+      current_position[E_AXIS] -= 58; // Pull back 57mm, 7 mm below drive gear
     #else
       current_position[E_AXIS] -= 52;
     #endif
