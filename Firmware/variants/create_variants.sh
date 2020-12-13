@@ -16,6 +16,7 @@ BASE="1_75mm_MK3-EINSy10a-E3Dv6full.h"
 VARIANT="1_75mm_MK3-BEAR-EINSy10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3 BEAR"/' ${VARIANT}
+sed -i -e 's/\/\/ Printer revision*/\/\/ Printer revision\n#define BEAR_EXTRUDER/' ${VARIANT}
 
 ## Bondtech Prusa Extruder
 VARIANT="1_75mm_MK3-Bondtech-16-EINSy10a-E3Dv6full.h"
@@ -40,6 +41,7 @@ VARIANT="1_75mm_MK3S-BEAR-EINSy10a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK3S BEAR"/' ${VARIANT}
 sed -i -e 's/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 9.0*/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 2.0/' ${VARIANT}
+sed -i -e 's/\/\/ Printer revision*/\/\/ Printer revision\n#define BEAR_EXTRUDER/' ${VARIANT}
 
 ## Bondtech Prusa Extruder
 VARIANT="1_75mm_MK3S-Bondtech-16-EINSy10a-E3Dv6full.h"
@@ -65,6 +67,7 @@ VARIANT="1_75mm_MK25S-BEAR-RAMBo13a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5S"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5S BEAR"/' ${VARIANT}
 sed -i -e 's/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 9.0*/#define Z_MAX_POS_XYZ_CALIBRATION_CORRECTION 2.0/' ${VARIANT}
+sed -i -e 's/\/\/ Printer revision*/\/\/ Printer revision\n#define BEAR_EXTRUDER/' ${VARIANT}
 
 ## Bondtech Prusa Extruder
 VARIANT="1_75mm_MK25S-Bondtech-16-RAMBo13a-E3Dv6full.h"
@@ -100,6 +103,7 @@ BASE="1_75mm_MK25-RAMBo13a-E3Dv6full.h"
 VARIANT="1_75mm_MK25-BEAR-RAMBo13a-E3Dv6full.h"
 cp ${BASE} ${VARIANT}
 sed -i -e 's/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5"*/#define CUSTOM_MENDEL_NAME "Prusa i3 MK2.5 BEAR"/' ${VARIANT}
+sed -i -e 's/\/\/ Printer revision*/\/\/ Printer revision\n#define BEAR_EXTRUDER/' ${VARIANT}
 
 ## Bondtech Prusa Extruder
 VARIANT="1_75mm_MK25-Bondtech-16-RAMBo13a-E3Dv6full.h"

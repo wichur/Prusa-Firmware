@@ -8,6 +8,7 @@
  *------------------------------------*/
 
 // Printer revision
+#define BEAR_EXTRUDER
 #define PRINTER_TYPE PRINTER_MK25
 #define PRINTER_NAME PRINTER_MK25_NAME
 #define PRINTER_MMU_TYPE PRINTER_MK25_MMU2
